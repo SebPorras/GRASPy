@@ -24,7 +24,7 @@ class BranchPoint(object):
     """
 
     def __init__(self, id: str, parent: int, dist: float,
-                 children: npt.ArrayLike) -> None:
+                 children: npt.NDArray) -> None:
         """ Constructs instance of a branchpoint.
 
         Parameters:
@@ -53,8 +53,8 @@ class BranchPoint(object):
 
 
 class IdxTree(object):
-    """Represents a condensed phylogenetic tree. Each branchpoint is assigned 
-    an index allowing easy access of information via that index. 
+    """Represents a condensed phylogenetic tree. Each branchpoint is assigned
+    an index allowing easy access of information via that index.
     """
 
     def __init__(self, nBranches: int, branchpoints: npt.NDArray,
@@ -62,19 +62,19 @@ class IdxTree(object):
                  distances: npt.NDArray) -> None:
         """
         Parameters:
-            nBranchs(int): number of branch points in the tree 
+            nBranchs(int): number of branch points in the tree
 
-            branchpoints(Array): Contains BranchPoint objects  
+            branchpoints(Array): Contains BranchPoint objects
 
-            parents(Array): maps the index of the child to the index 
-            of the parent 
+            parents(Array): maps the index of the child to the index
+            of the parent
 
-            children(Array): maps the index of the parent to an array 
-            containing the indexes the child/children 
+            children(Array): maps the index of the parent to an array
+            containing the indexes the child/children
 
-            indices(dict): Maps the sequence ID to the index on the tree 
+            indices(dict): Maps the sequence ID to the index on the tree
 
-            distances(Array): Maps the branchpoint to the distance to its parent 
+            distances(Array): Maps the branchpoint to the distance to its parent
         """
 
         self._nBranches = nBranches
@@ -88,7 +88,7 @@ class IdxTree(object):
         return f"Number of branchpoints: {self._nBranches}\nParents: {self._parents}\nChildren: {self._children}\nIndices: {self._indices}\nDistances: {self._distances}"
 
     def getIndexOf(self, name: str) -> int:
-        """Retrieves the branchpoint index based on the sequence ID 
+        """Retrieves the branchpoint index based on the sequence ID
 
         Parameters:
             name (str): sequence name
@@ -100,12 +100,45 @@ class IdxTree(object):
 
         return self._indices[name]
 
+    def _createNwk(self, i: int = 0) -> str:
+        """Traverses the tree recursively and creates a 
+        string in Newick Standard (nwk) format. User should use 
+        writeNwk() if they wish to create an output file. 
+
+        Parameters:
+            i(int): defines where traversal will begin. Default
+            use starts at root of tree but subtrees can also be 
+            accessed by changing default value. 
+        """
+        nwk = ""
+
+        if None in self._branchpoints[i]._children:
+
+            nwk += f"{self._branchpoints[i]._id}:{self._branchpoints[i]._dist}"
+
+        else:
+
+            for c in self._branchpoints[i]._children:
+                nwk += self._createNwk(c) + ','
+
+            # slicing removes final ',' at end of subtree
+            if self._branchpoints[i]._id == '0':
+
+                nwk = "(" + nwk[:-1] + \
+                    f"){self._branchpoints[i]._id}:{self._branchpoints[i]._dist};"
+            else:
+
+                nwk = "(" + nwk[:-1] + \
+                    f"){self._branchpoints[i]._id}:{self._branchpoints[i]._dist}"
+
+        return nwk
+
 
 def IdxTreeFromJSON(serial: dict) -> IdxTree:
     """Instantiates a IdxTree object from a Json file
 
     Parameters:
-        json_file (os.PathLike): path to json file 
+        json_file (os.PathLike): path to json file
 
     Returns:
         IdxTree

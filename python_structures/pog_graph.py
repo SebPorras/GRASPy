@@ -48,7 +48,7 @@ class Edge(object):
 
     def __str__(self) -> str:
 
-        return (f"Start: {self._start}\nEnd: {self._end}\nType: {self._edgeType}\nWeight: {self._weight}\nBackward: {self._backward}\n Forward: {self._forward}\nRecip: {self._recip}")
+        return (f"Start: {self._start}\nEnd: {self._end}\nType: {self._edgeType}\nWeight: {self._weight}\nBackward: {self._backward}\nForward: {self._forward}\nRecip: {self._recip}")
 
 
 class SymNode(object):

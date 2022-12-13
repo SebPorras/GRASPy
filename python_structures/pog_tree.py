@@ -29,6 +29,23 @@ class POGTree(object):
         self._idxTree = idxTree
         self._graphs = POGraphs
 
+    def writeNwk(self, file_name: str) -> None:
+        """Writes the tree including ancestors in the 
+        Newick Standard (nwk) format  
+
+        Parameters: 
+            file_name(str): specify the file name 
+            and file path for output
+        """
+
+        if file_name[-4:] != ".nwk":
+            file_name += ".nwk"
+
+        nwk = self._idxTree._createNwk()
+
+        with open(file_name, "w") as out:
+            out.write(nwk)
+
 
 def POGTreeFromJSON(json_path: str) -> POGTree:
     """Instantiates a POGraph object from a JSON file.
@@ -70,7 +87,9 @@ if __name__ == "__main__":
 
     poggers = POGTreeFromJSON("./python_structures/ASR_big.json")
 
-    for n in poggers._graphs[0]._nodes:
-        if len(n._edges) >= 2:
-            for e in n._edges:
-                print(e)
+    test = poggers.writeNwk("tester.nwk")
+
+    # for n in poggers._graphs[0]._nodes:
+    #     if len(n._edges) >= 2:
+    #         for e in n._edges:
+    #             print(e)
