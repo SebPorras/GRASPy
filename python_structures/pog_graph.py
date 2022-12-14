@@ -8,8 +8,7 @@
 ###############################################################################
 
 import numpy as np
-#import nptyping as npt
-import numpy.typing as npt
+from nptyping import NDArray
 from typing import Optional
 
 
@@ -82,7 +81,7 @@ class POGraph(object):
     Each sequence position is assigned a SymNode with Edges.
     """
 
-    def __init__(self, version: str, indices: npt.NDArray, nodes: list,
+    def __init__(self, version: str, indices: NDArray, nodes: list,
                  start: int, end: int, size: int, terminated: bool,
                  directed: bool, name: str, isAncestor: bool) -> None:
         """Constructs instance of POGraph.

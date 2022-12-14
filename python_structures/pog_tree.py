@@ -10,7 +10,7 @@
 import json
 from pog_graph import *
 from idx_tree import *
-# from ete3 import Tree
+from ete3 import Tree
 
 
 class POGTree(object):
@@ -43,7 +43,8 @@ class POGTree(object):
 
         return self._idxTree._indices[name]
 
-    def writeNwk(self, file_name: str, root: str = "N0") -> None:
+    def writeNwk(self, file_name: str, root: str = "N0",
+                 toFile: Optional[bool] = True) -> Optional[str]:
         """Writes the tree including ancestors in the
         Newick Standard (nwk) format. Root is based on
         sequence ID.
@@ -54,6 +55,9 @@ class POGTree(object):
 
             root(str): Default set to N0 at the "root" ancestor
             but can be changed to create subtrees if desired.
+
+            toFile(bool): return a nwk file, else return the
+            nwk string 
         """
 
         idx = self._toIndex(root)
@@ -63,8 +67,11 @@ class POGTree(object):
 
         nwk = self._idxTree._createNwk(i=idx) + ';'
 
-        with open(file_name, "w") as out:
-            out.write(nwk)
+        if toFile:
+            with open(file_name, "w") as out:
+                out.write(nwk)
+        else:
+            return nwk
 
     def getPOGraphOf(self, id: str) -> POGraph:
         """Grabs a POGraph for a chosen sequence
@@ -167,11 +174,25 @@ def POGTreeFromJSON(json_path: str) -> POGTree:
     return POGTree(idxTree=tree, POGraphs=graphs, annotations=annots)
 
 
+def toETE3(POGTree: POGTree):
+    """Converts POGTree into ETE3 Tree object 
+    to enable use of library
+    """
+
+    nwk = POGTree.writeNwk("test", toFile=False)
+
+    t = Tree(nwk, format=1)
+
+    return t
+
+
 if __name__ == "__main__":
 
     poggers = POGTreeFromJSON("./python_structures/ASR_big.json")
 
     poggers.writeNwk(file_name="tester.nwk", root="N0")
+    nwk = poggers.writeNwk(file_name="subtree.nwk", root="N19",
+                           toFile=False)
 
     g = poggers.getPOGraphOf("XP_006629927.2")
 
@@ -179,3 +200,4 @@ if __name__ == "__main__":
     poggers.addAln('./python_structures/big_test_data/GRASPTutorial_Final.aln')
 
     print(poggers.annotations["N0"]["Alignment"])
+    # print(poggers.annotations)

@@ -12,8 +12,7 @@
 #################################################################################
 
 import numpy as np
-#import nptyping as npt
-import numpy.typing as npt
+from nptyping import NDArray
 
 
 class BranchPoint(object):
@@ -25,7 +24,7 @@ class BranchPoint(object):
     """
 
     def __init__(self, id: str, parent: int, dist: float,
-                 children: npt.NDArray) -> None:
+                 children: NDArray) -> None:
         """ Constructs instance of a branchpoint.
 
         Parameters:
@@ -56,9 +55,9 @@ class IdxTree(object):
     an index allowing easy access of information via that index.
     """
 
-    def __init__(self, nBranches: int, branchpoints: npt.NDArray,
-                 parents: npt.NDArray, children: npt.NDArray, indices: dict,
-                 distances: npt.NDArray) -> None:
+    def __init__(self, nBranches: int, branchpoints: NDArray,
+                 parents: NDArray, children: NDArray, indices: dict,
+                 distances: NDArray) -> None:
         """
         Parameters:
             nBranchs(int): number of branch points in the tree
