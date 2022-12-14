@@ -8,6 +8,7 @@
 ###############################################################################
 
 import numpy as np
+#import nptyping as npt
 import numpy.typing as npt
 from typing import Optional
 
@@ -57,7 +58,7 @@ class SymNode(object):
     and all of the edges at this position.
     """
 
-    def __init__(self, name: int, value: str, edges: list[Edge]) -> None:
+    def __init__(self, name: int, value: str, edges: list) -> None:
         """Constructs instance of the object.
 
         Parameters:
@@ -81,7 +82,7 @@ class POGraph(object):
     Each sequence position is assigned a SymNode with Edges.
     """
 
-    def __init__(self, version: str, indices: npt.NDArray, nodes: list[SymNode],
+    def __init__(self, version: str, indices: npt.NDArray, nodes: list,
                  start: int, end: int, size: int, terminated: bool,
                  directed: bool, name: str, isAncestor: bool) -> None:
         """Constructs instance of POGraph.
