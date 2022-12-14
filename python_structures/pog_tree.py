@@ -29,22 +29,46 @@ class POGTree(object):
         self._idxTree = idxTree
         self._graphs = POGraphs
 
-    def writeNwk(self, file_name: str) -> None:
+    def _toIndex(self, name: str) -> int:
+        """Converts sequence name to mapped index
+
+        Parameters:
+            name(str): Sequence ID 
+
+        Returns:
+            int: Index for POGraph and IdxTree branchpoint
+        """
+
+        return self._idxTree._indices[name]
+
+    def writeNwk(self, file_name: str, root: str = "N0") -> None:
         """Writes the tree including ancestors in the 
-        Newick Standard (nwk) format  
+        Newick Standard (nwk) format. Root is based on 
+        sequence ID. 
 
         Parameters: 
             file_name(str): specify the file name 
             and file path for output
+
+            root(str): Default set to N0 at the "root" ancestor 
+            but can be changed to create subtrees if desired. 
         """
+
+        idx = self._toIndex(root)
 
         if file_name[-4:] != ".nwk":
             file_name += ".nwk"
 
-        nwk = self._idxTree._createNwk()
+        nwk = self._idxTree._createNwk(i=idx) + ';'
 
         with open(file_name, "w") as out:
             out.write(nwk)
+
+    def getPOGraphOf(self, id: str) -> POGraph:
+
+        idx = self._toIndex(id)
+
+        return self._graphs[idx]
 
 
 def POGTreeFromJSON(json_path: str) -> POGTree:
@@ -68,7 +92,7 @@ def POGTreeFromJSON(json_path: str) -> POGTree:
 
         g = POGraphFromJSON(e, isAncestor=False)
 
-        idx = tree.getIndexOf(g._name)
+        idx = tree._indices[g._name]
 
         graphs[idx] = g
 
@@ -76,7 +100,7 @@ def POGTreeFromJSON(json_path: str) -> POGTree:
 
         g = POGraphFromJSON(a, isAncestor=True)
 
-        idx = tree.getIndexOf(g._name)
+        idx = tree._indices[g._name]
 
         graphs[idx] = g
 
@@ -87,9 +111,11 @@ if __name__ == "__main__":
 
     poggers = POGTreeFromJSON("./python_structures/ASR_big.json")
 
-    test = poggers.writeNwk("tester.nwk")
+    test = poggers.writeNwk(file_name="tester.nwk", root="N0")
 
-    # for n in poggers._graphs[0]._nodes:
-    #     if len(n._edges) >= 2:
-    #         for e in n._edges:
-    #             print(e)
+    g = poggers.getPOGraphOf("XP_006629927.2")
+
+    # print(poggers._graphs)
+    # g = poggers._graphs[38]
+    # print(poggers._graphs)
+    # print(g._name)

@@ -35,8 +35,6 @@ class BranchPoint(object):
             dist(float): Distance to parent
 
             children(np.array): all children of branchpoint
-
-            isLeaf(bool): Marker for extant sequence
         """
 
         self._id = id
@@ -87,28 +85,14 @@ class IdxTree(object):
     def __str__(self) -> str:
         return f"Number of branchpoints: {self._nBranches}\nParents: {self._parents}\nChildren: {self._children}\nIndices: {self._indices}\nDistances: {self._distances}"
 
-    def getIndexOf(self, name: str) -> int:
-        """Retrieves the branchpoint index based on the sequence ID
-
-        Parameters:
-            name (str): sequence name
-
-        Returns:
-            int: index of branchpoint for that sequence
-
-        """
-
-        return self._indices[name]
-
     def _createNwk(self, i: int = 0) -> str:
         """Traverses the tree recursively and creates a 
         string in Newick Standard (nwk) format. User should use 
         writeNwk() if they wish to create an output file. 
 
         Parameters:
-            i(int): defines where traversal will begin. Default
-            use starts at root of tree but subtrees can also be 
-            accessed by changing default value. 
+            i(int): defines where traversal will begin. Default use starts at root 
+            of tree but subtrees can also be accessed by changing default value. 
         """
         nwk = ""
 
@@ -122,15 +106,10 @@ class IdxTree(object):
                 nwk += self._createNwk(c) + ','
 
             # slicing removes final ',' at end of subtree
-            if self._branchpoints[i]._id == '0':
+            nwk = "(" + nwk[:-1] + \
+                f"){self._branchpoints[i]._id}:{self._branchpoints[i]._dist}"
 
-                nwk = "(" + nwk[:-1] + \
-                    f"){self._branchpoints[i]._id}:{self._branchpoints[i]._dist};"
-            else:
-
-                nwk = "(" + nwk[:-1] + \
-                    f"){self._branchpoints[i]._id}:{self._branchpoints[i]._dist}"
-
+        # ; is added in writeNwk() to allow creation of subtrees
         return nwk
 
 
@@ -175,8 +154,13 @@ def IdxTreeFromJSON(serial: dict) -> IdxTree:
             distances[i] = jdists[i]
         else:
             distances[i] = None
+
         # index by sequence id and map branch point index
-        indices[jlabels[i]] = i
+        lab = jlabels[i]
+        if lab.isdigit():
+            lab = "N" + lab
+
+        indices[lab] = i
 
     # Next step is to record children of each parent
     for PIdx in range(nBranches):
@@ -200,8 +184,12 @@ def IdxTreeFromJSON(serial: dict) -> IdxTree:
     # branch points mirror information in the tree but is more specific
     for BIdx in range(nBranches):
 
+        lab = jlabels[BIdx]
+        if lab.isdigit():
+            lab = "N" + lab
+
         # future implementations of branch points will have annotations
-        bp = BranchPoint(id=jlabels[BIdx], parent=parents[BIdx],
+        bp = BranchPoint(id=lab, parent=parents[BIdx],
                          dist=distances[BIdx], children=children[BIdx])
 
         bpoints[BIdx] = bp

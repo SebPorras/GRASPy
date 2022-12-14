@@ -228,7 +228,13 @@ def POGraphFromJSON(jpog: dict, isAncestor: bool = False) -> POGraph:
 
                 cor_node._edges.append(edge)
 
+    # adds ancestor identifier "N"
+    name = jpog["Name"]
+
+    if name.isdigit():
+        name = "N" + name
+
     return POGraph(version=jpog["GRASP_version"], indices=indices,
                    start=jpog["Starts"], end=jpog["Ends"], size=jpog["Size"],
                    terminated=jpog["Terminated"], directed=jpog["Directed"],
-                   name=jpog["Name"], isAncestor=isAncestor, nodes=nodes)
+                   name=name, isAncestor=isAncestor, nodes=nodes)
