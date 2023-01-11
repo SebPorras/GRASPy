@@ -21,7 +21,9 @@ def sendRequest(message: str) -> str:
         Response from bnkit server
     """
 
-    HOST = "127.0.0.1"
+    #HOST = "127.0.0.1"
+    HOST = '10.139.1.21'
+
     PORT = 4072
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM)\
@@ -35,5 +37,6 @@ def sendRequest(message: str) -> str:
 
         response = s.recv(1024)
 
+    print("Response ")
     print(f"{response!r}")
-    return f"Response: {response!r}"
+    # return f"Response: {response!r}"

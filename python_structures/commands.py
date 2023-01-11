@@ -89,7 +89,7 @@ def requestJointReconstruction(aln: str, nwk: str,
     request = dict()
 
     request["Command"] = "Recon"
-    request["Authentication"] = auth
+    request["Auth"] = auth
 
     params = dict()
 
@@ -106,7 +106,10 @@ def requestJointReconstruction(aln: str, nwk: str,
 
     request["Parameters"] = params
 
-    j_request = json.dumps(request)
+    j_request = json.dumps(request) + '\n'
+    print("j_request")
+
+    print(j_request)
 
     return client.sendRequest(j_request)
 
@@ -119,16 +122,16 @@ def requestJobStatus(job_id: str, auth: str = "Guest") -> str:
         auth(str): Authentication token, defaults to Guest
 
     Returns:
-        str: Bnkit response 
+        str: bnkit job status  
     """
 
     request = dict()
 
     request["Command"] = "JobStatus"
-    request["Authentication"] = auth
+    request["Auth"] = auth
     request["Job"] = job_id
 
-    j_request = json.dumps(request)
+    j_request = json.dumps(request) + '\n'
 
     return client.sendRequest(j_request)
 
@@ -142,23 +145,23 @@ def requestJobResult(job_id: str, auth: str = "Guest") -> str:
         auth(str): Authentication token, defaults to Guest
 
     Returns:
-        str: Bnkit response 
+        str: Bnkit response for completed job 
     """
 
     request = dict()
 
     request["Command"] = "JobResult"
-    request["Authentication"] = auth
+    request["Auth"] = auth
     request["Job"] = job_id
 
-    j_request = json.dumps(request)
+    j_request = json.dumps(request) + '\n'
 
     return client.sendRequest(j_request)
 
 
 joint = requestJointReconstruction(
-    aln="./python_structures/small_test_data/test_aln.aln",
-    nwk="./python_structures/small_test_data/test_nwk.nwk")
+    aln="./test_data/small_test_data/test_aln.aln",
+    nwk="./test_data/small_test_data/test_nwk.nwk")
 
 #jobStatus = requestJobStatus("ABC123")
 

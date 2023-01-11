@@ -13,9 +13,11 @@ from idx_tree import *
 
 
 class POGTree(object):
-    """Contains an IdxTree and a POGraph for each branch point.
-    All graphs and branchpoints are assigned the same index for
-    continuity
+    """The Partial Order Graph Tree (POGTree), is a phylogenetic tree that 
+    contains two data structures. 1) An IdxTree object which holds
+    information about the topology and information about the sequence at 
+    each branchpoint of the tree. 2) A POGraph object which describes
+    the graph of the sequence at that branchpoint.
     """
 
     def __init__(self, idxTree: IdxTree, POGraphs: dict[str, POGraph]) -> None:
@@ -59,31 +61,27 @@ class POGTree(object):
 
         return nwk
 
-    def writeNwk(self, name: str, root: str = "N0") -> str:
-        """Writes a nwk string of the tree to a file"""
+    def writeNwk(self, file_name: str, root: str = "N0") -> str:
+        """Writes a nwk string of the tree to a file
+        
+        Parameters: 
+
+            file_name(str): name of nwk file
+
+            root(str): Default set to N0 at the "root" ancestor
+            but can be changed to create subtrees if desired. 
+        """
 
         nwk = self.pogToNwk(root) + ';'
 
-        with open(name, 'w') as f:
+        with open(file_name, 'w') as f:
             f.write(nwk)
 
         return nwk
 
-    def getPOGraphOf(self, id: str) -> POGraph:
-        """Grabs a POGraph for a chosen sequence
-
-        Parameters:
-            id(str): Sequence ID
-
-        Returns:
-            POGraph
-        """
-
-        return self.graphs[id]
-
 
 def POGTreeFromJSON(json_path: str) -> POGTree:
-    """Instantiates a POGraph object from a JSON file.
+    """Instantiates a POGTree object from a JSON file.
 
     Parameters:
         json_path (json): path to JSON file
@@ -116,10 +114,11 @@ def POGTreeFromJSON(json_path: str) -> POGTree:
 
 if __name__ == "__main__":
 
-    poggers = POGTreeFromJSON("./python_structures/small_test_data/ASR.json")
+    poggers = POGTreeFromJSON("./test_data/small_test_data/ASR.json")
+    print(poggers.idxTree.branchpoints["N0"].children)
+    # print(poggers.pogToNwk())
 
-
-    print(poggers.graphs['XP_004050792.2'].version)
+    # print(poggers.graphs['XP_004050792.2'].version)
     # for i in poggers.idxTree.branchpoints:
     #     # if None in i.children:
     #     print(i)

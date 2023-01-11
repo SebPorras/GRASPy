@@ -49,8 +49,10 @@ class BranchPoint(object):
 
 
 class IdxTree(object):
-    """Represents a condensed phylogenetic tree. Each branchpoint is assigned
-    an index allowing easy access of information via that index.
+    """IdxTree is condensed phylogenetic tree representation within a 
+    POGTree object. Each branchpoint is assigned an index and a BranchPoint
+    object, allowing easy access of information via the sequence name of
+    an extant or an ancestor. 
     """
 
     def __init__(self, nBranches: int, branchpoints: dict[str, BranchPoint],
