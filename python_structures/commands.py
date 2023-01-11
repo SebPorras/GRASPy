@@ -104,13 +104,9 @@ def requestJointReconstruction(aln: str, nwk: str,
     params["Indels"] = indels
     params["Model"] = model
 
-    print(f"Your request: {params}\n")
-
     request["Parameters"] = params
 
     j_request = json.dumps(request)
-
-    print(f"Your request: \n{j_request}\n")
 
     return client.sendRequest(j_request)
 
@@ -134,8 +130,6 @@ def requestJobStatus(job_id: str, auth: str = "Guest") -> str:
 
     j_request = json.dumps(request)
 
-    print(f"Your request: \n{j_request}\n")
-
     return client.sendRequest(j_request)
 
 
@@ -158,8 +152,6 @@ def requestJobResult(job_id: str, auth: str = "Guest") -> str:
     request["Job"] = job_id
 
     j_request = json.dumps(request)
-
-    print(f"Your request: \n{j_request}\n")
 
     return client.sendRequest(j_request)
 

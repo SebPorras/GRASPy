@@ -11,8 +11,7 @@
 # info about what parents are and how far away they are etc.
 #################################################################################
 
-import numpy as np
-from nptyping import NDArray
+from typing import Union
 
 
 class BranchPoint(object):
@@ -21,10 +20,11 @@ class BranchPoint(object):
     long that branch point is.
 
     Future use -> can associate annotations with this branch point
+    but must be in JSON format
     """
 
-    def __init__(self, id: str, parent: int, dist: float,
-                 children: NDArray) -> None:
+    def __init__(self, id: str, parent: Union[str, None], dist: float,
+                 children: list[str]) -> None:
         """ Constructs instance of a branchpoint.
 
         Parameters:
@@ -37,17 +37,15 @@ class BranchPoint(object):
             children(np.array): all children of branchpoint
         """
 
-        self._id = id
-        self._parent = parent
-        self._dist = dist
-        self._children = children
+        self.id = id
+        self.parent = parent
+        self.dist = dist
+        self.children = children
+        self.annotations = dict()
 
     def __str__(self) -> str:
 
-        return (f"Name: {self._id}\n\
-        Parent Index: {self._parent}\n\
-        Distance To Parent {self._dist}\n\
-        Children IDs: {self._children}")
+        return (f"Name: {self.id}\nParent: {self.parent}\nDistance To Parent {self.dist}\nChildren: {self.children}")
 
 
 class IdxTree(object):
@@ -55,9 +53,9 @@ class IdxTree(object):
     an index allowing easy access of information via that index.
     """
 
-    def __init__(self, nBranches: int, branchpoints: NDArray,
-                 parents: NDArray, children: NDArray, indices: dict,
-                 distances: NDArray) -> None:
+    def __init__(self, nBranches: int, branchpoints: dict[str, BranchPoint],
+                 parents: list[int], children: list[list[Union[int, None]]],
+                 indices: dict[str, int], distances: list[float]) -> None:
         """
         Parameters:
             nBranchs(int): number of branch points in the tree
@@ -75,42 +73,15 @@ class IdxTree(object):
             distances(Array): Maps the branchpoint to the distance to its parent
         """
 
-        self._nBranches = nBranches
-        self._branchpoints = branchpoints
-        self._parents = parents
-        self._children = children
-        self._indices = indices
-        self._distances = distances
+        self.nBranches = nBranches
+        self.branchpoints = branchpoints
+        self.parents = parents
+        self.children = children
+        self.indices = indices
+        self.distances = distances
 
     def __str__(self) -> str:
-        return f"Number of branchpoints: {self._nBranches}\nParents: {self._parents}\nChildren: {self._children}\nIndices: {self._indices}\nDistances: {self._distances}"
-
-    def _createNwk(self, i: int = 0) -> str:
-        """Traverses the tree recursively and creates a 
-        string in Newick Standard (nwk) format. User should use 
-        writeNwk() if they wish to create an output file. 
-
-        Parameters:
-            i(int): defines where traversal will begin. Default use starts at root 
-            of tree but subtrees can also be accessed by changing default value. 
-        """
-        nwk = ""
-
-        if None in self._branchpoints[i]._children:
-
-            nwk += f"{self._branchpoints[i]._id}:{self._branchpoints[i]._dist}"
-
-        else:
-
-            for c in self._branchpoints[i]._children:
-                nwk += self._createNwk(c) + ','
-
-            # slicing removes final ',' at end of subtree
-            nwk = "(" + nwk[:-1] + \
-                f"){self._branchpoints[i]._id}:{self._branchpoints[i]._dist}"
-
-        # ; is added in writeNwk() to allow creation of subtrees
-        return nwk
+        return f"Number of branchpoints: {self.nBranches}\nParents: {self.parents}\nChildren: {self.children}\nIndices: {self.indices}\nDistances: {self.distances}"
 
 
 def IdxTreeFromJSON(serial: dict) -> IdxTree:
@@ -123,46 +94,38 @@ def IdxTreeFromJSON(serial: dict) -> IdxTree:
         IdxTree
     """
 
-    # Some reconstructions do not require tree distances
-    try:
-        jdists = serial["Input"]["Tree"]["Distances"]
-    except KeyError:
-        jdists = None
+    # Currently, assuming that output will contain all these fields
 
-    try:
-        # refer to IdxTree for explanation of these datatypes
-        nBranches = serial["Input"]["Tree"]["Branchpoints"]
-        jlabels = serial["Input"]["Tree"]["Labels"]
-        jparents = serial["Input"]["Tree"]["Parents"]
-    except:
-        raise RuntimeError("Invalid JSON format")
+    if ("Distances" or "Branchpoints" or "Labels" or "Parents") \
+            not in serial["Input"]["Tree"].keys():
+        raise RuntimeError("JSON in incorrect format")
 
-    parents = np.array([None for i in range(nBranches)])
-    bpoints = np.array([None for i in range(nBranches)])
-    children = np.array([None for i in range(nBranches)])
-    distances = np.array([None for i in range(nBranches)])
+    jdists = serial["Input"]["Tree"]["Distances"]
+    nBranches = serial["Input"]["Tree"]["Branchpoints"]
+    jlabels = serial["Input"]["Tree"]["Labels"]
+    jparents = serial["Input"]["Tree"]["Parents"]
+
+    # index by child branch point index and map their parent index
+    parents = [jparents[i] for i in range(nBranches)]
+
+    # using same index as branch point, map distances
+    distances = [jdists[i] for i in range(nBranches)]
+
     indices = dict()
 
     for i in range(nBranches):
 
-        # index by child branch point index and map their parent index
-        parents[i] = jparents[i]
-
-        if jdists is not None:
-
-            # using same index as branch point, map distances
-            distances[i] = jdists[i]
-        else:
-            distances[i] = None
-
         # index by sequence id and map branch point index
         lab = jlabels[i]
+
         if lab.isdigit():
             lab = "N" + lab
 
         indices[lab] = i
 
     # Next step is to record children of each parent
+    children = []
+
     for PIdx in range(nBranches):
 
         curr_children = []
@@ -175,24 +138,51 @@ def IdxTreeFromJSON(serial: dict) -> IdxTree:
 
         # Leaves will have no children which is recorded accordingly
         if len(curr_children) == 0:
-            ch_array = np.array(None, dtype=None)
-        else:
-            ch_array = np.array(curr_children, dtype=int)
+            curr_children = [None]
 
-        children[PIdx] = ch_array
+        children.append(curr_children)
 
-    # branch points mirror information in the tree but is more specific
+    # branch points mirror information in the tree but in human readble form
+    bpoints = {}
+
     for BIdx in range(nBranches):
 
-        lab = jlabels[BIdx]
-        if lab.isdigit():
-            lab = "N" + lab
+        # marks ancestor labels with an 'N' to avoid confusion
+        name = jlabels[BIdx]
+        if name.isdigit():
 
-        # future implementations of branch points will have annotations
-        bp = BranchPoint(id=lab, parent=parents[BIdx],
-                         dist=distances[BIdx], children=children[BIdx])
+            name = "N" + name
 
-        bpoints[BIdx] = bp
+        # convert parent indexes to seq names
+        c_lab = []
+
+        if None in children[BIdx]:
+            c_lab.append(None)
+        else:
+            for i in children[BIdx]:
+
+                lab = jlabels[i]
+                if lab.isdigit():
+
+                    lab = "N" + lab
+
+                c_lab.append(lab)
+
+        # convert parent indexes to seq names
+        p_idx = parents[BIdx]
+
+        if p_idx == -1:
+            p = None
+
+        else:
+            p = "N" + jlabels[p_idx]
+
+        bp = BranchPoint(id=name,
+                         parent=p,
+                         dist=distances[BIdx],
+                         children=c_lab)
+
+        bpoints[name] = bp
 
     return IdxTree(nBranches=nBranches, branchpoints=bpoints, parents=parents,
                    children=children, indices=indices, distances=distances)

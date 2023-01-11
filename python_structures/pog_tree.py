@@ -10,7 +10,6 @@
 import json
 from pog_graph import *
 from idx_tree import *
-from ete3 import Tree
 
 
 class POGTree(object):
@@ -19,7 +18,7 @@ class POGTree(object):
     continuity
     """
 
-    def __init__(self, idxTree: IdxTree, POGraphs: dict, annotations: dict) -> None:
+    def __init__(self, idxTree: IdxTree, POGraphs: dict[str, POGraph]) -> None:
         """Constructs instance of POGTree
 
         Parameters:
@@ -27,51 +26,48 @@ class POGTree(object):
             POGraph(POGraph)
         """
 
-        self._idxTree = idxTree
-        self._graphs = POGraphs
-        self.annotations = annotations
+        self.idxTree = idxTree
+        self.graphs = POGraphs
 
-    def _toIndex(self, name: str) -> int:
-        """Converts sequence name to mapped index
-
-        Parameters:
-            name(str): Sequence ID
-
-        Returns:
-            int: Index for POGraph and IdxTree branchpoint
-        """
-
-        return self._idxTree._indices[name]
-
-    def writeNwk(self, file_name: str, root: str = "N0",
-                 toFile: Optional[bool] = True) -> Optional[str]:
+    def pogToNwk(self, root: str = "N0",) -> str:
         """Writes the tree including ancestors in the
         Newick Standard (nwk) format. Root is based on
         sequence ID.
 
         Parameters:
-            file_name(str): specify the file name
-            and file path for output
-
             root(str): Default set to N0 at the "root" ancestor
-            but can be changed to create subtrees if desired.
+            but can be changed to create subtrees if desired. 
 
-            toFile(bool): return a nwk file, else return the
-            nwk string 
+        Returns:
+            str: The POGTree in nwk format 
         """
 
-        idx = self._toIndex(root)
+        nwk = ""
 
-        if file_name[-4:] != ".nwk":
-            file_name += ".nwk"
+        if None in self.idxTree.branchpoints[root].children:
 
-        nwk = self._idxTree._createNwk(i=idx) + ';'
+            nwk += f"{self.idxTree.branchpoints[root].id}:{self.idxTree.branchpoints[root].dist}"
 
-        if toFile:
-            with open(file_name, "w") as out:
-                out.write(nwk)
         else:
-            return nwk
+
+            for c in self.idxTree.branchpoints[root].children:
+                nwk += self.pogToNwk(self.idxTree.branchpoints[c].id) + ','
+
+            # slicing removes final ',' at end of subtree
+            nwk = "(" + nwk[:-1] + \
+                f"){self.idxTree.branchpoints[root].id}:{self.idxTree.branchpoints[root].dist}"
+
+        return nwk
+
+    def writeNwk(self, name: str, root: str = "N0") -> str:
+        """Writes a nwk string of the tree to a file"""
+
+        nwk = self.pogToNwk(root) + ';'
+
+        with open(name, 'w') as f:
+            f.write(nwk)
+
+        return nwk
 
     def getPOGraphOf(self, id: str) -> POGraph:
         """Grabs a POGraph for a chosen sequence
@@ -83,53 +79,7 @@ class POGTree(object):
             POGraph
         """
 
-        idx = self._toIndex(id)
-
-        return self._graphs[idx]
-
-    def addAln(self, file_name: str) -> None:
-        """Can add alignment sequences to self.annotations dict.
-        Must be in FASTA or Aln format. 
-
-        Parameters:
-            file_name(str): specify the file name/path 
-            to be read.  
-        """
-
-        if not any(s in file_name for s in [".fa", ".fasta", ".aln"]):
-            raise RuntimeError(
-                "Incorrect file format, must be .fasta or .fa or .aln")
-
-        annot = {}
-        with open(file_name, "r") as fa:
-
-            line = fa.readline()
-
-            while line:
-
-                if line[0] == ">":
-
-                    # remove everything except sequence ID
-                    key = line.split()[0][1:].strip()
-                    aln = ""
-
-                    line = fa.readline()
-
-                    while line[0] != ">":
-
-                        aln += line.strip()
-                        line = fa.readline()
-
-                        if not line:
-                            break
-
-                    annot[key] = aln
-
-                else:
-                    line = fa.readline()
-
-        for id, seq in annot.items():
-            self.annotations[id]["Alignment"] = seq
+        return self.graphs[id]
 
 
 def POGTreeFromJSON(json_path: str) -> POGTree:
@@ -153,51 +103,26 @@ def POGTreeFromJSON(json_path: str) -> POGTree:
 
         g = POGraphFromJSON(e, isAncestor=False)
 
-        idx = tree._indices[g._name]
-
-        graphs[idx] = g
+        graphs[g.name] = g
 
     for a in ancestors:
 
         g = POGraphFromJSON(a, isAncestor=True)
 
-        idx = tree._indices[g._name]
+        graphs[g.name] = g
 
-        graphs[idx] = g
-
-    # set up annotation dictionary
-    annots = {}
-
-    for k in tree._indices.keys():
-        annots[k] = {}
-
-    return POGTree(idxTree=tree, POGraphs=graphs, annotations=annots)
-
-
-def toETE3(POGTree: POGTree):
-    """Converts POGTree into ETE3 Tree object 
-    to enable use of library
-    """
-
-    nwk = POGTree.writeNwk("test", toFile=False)
-
-    t = Tree(nwk, format=1)
-
-    return t
+    return POGTree(idxTree=tree, POGraphs=graphs)
 
 
 if __name__ == "__main__":
 
-    poggers = POGTreeFromJSON("./python_structures/ASR_big.json")
+    poggers = POGTreeFromJSON("./python_structures/small_test_data/ASR.json")
 
-    poggers.writeNwk(file_name="tester.nwk", root="N0")
-    nwk = poggers.writeNwk(file_name="subtree.nwk", root="N19",
-                           toFile=False)
 
-    g = poggers.getPOGraphOf("XP_006629927.2")
+    print(poggers.graphs['XP_004050792.2'].version)
+    # for i in poggers.idxTree.branchpoints:
+    #     # if None in i.children:
+    #     print(i)
+    #     print()
 
-    poggers.addAln('./python_structures/big_test_data/_ancestors.fa')
-    poggers.addAln('./python_structures/big_test_data/GRASPTutorial_Final.aln')
-
-    print(poggers.annotations["N0"]["Alignment"])
-    # print(poggers.annotations)
+  

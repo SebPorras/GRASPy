@@ -8,7 +8,7 @@
 ###############################################################################
 
 import numpy as np
-from nptyping import NDArray
+from numpy.typing import NDArray
 from typing import Optional
 
 
@@ -38,17 +38,17 @@ class Edge(object):
             weight(float): Support of the edge
         """
 
-        self._start = start
-        self._end = end
-        self._edgeType = edgeType
-        self._recip = recip
-        self._backward = backward
-        self._forward = forward
-        self._weight = weight
+        self.start = start
+        self.end = end
+        self.edgeType = edgeType
+        self.recip = recip
+        self.backward = backward
+        self.forward = forward
+        self.weight = weight
 
     def __str__(self) -> str:
 
-        return (f"Start: {self._start}\nEnd: {self._end}\nType: {self._edgeType}\nWeight: {self._weight}\nBackward: {self._backward}\nForward: {self._forward}\nRecip: {self._recip}")
+        return (f"Start: {self.start}\nEnd: {self.end}\nType: {self.edgeType}\nWeight: {self.weight}\nBackward: {self.backward}\nForward: {self.forward}\nRecip: {self.recip}")
 
 
 class SymNode(object):
@@ -68,12 +68,12 @@ class SymNode(object):
             edges(list): Contains all outgoing edges at this position
         """
 
-        self._name = name
-        self._value = value
-        self._edges = edges
+        self.name = name
+        self.value = value
+        self.edges = edges
 
     def __str__(self) -> str:
-        return (f"Name: {self._name}\n Value: {self._value}\n# of edges: {len(self._edges)}")
+        return (f"Name: {self.name}\nValue: {self.value}\n# of edges: {len(self.edges)}")
 
 
 class POGraph(object):
@@ -81,7 +81,7 @@ class POGraph(object):
     Each sequence position is assigned a SymNode with Edges.
     """
 
-    def __init__(self, version: str, indices: NDArray, nodes: list,
+    def __init__(self, version: str, indices: NDArray, nodes: list[SymNode],
                  start: int, end: int, size: int, terminated: bool,
                  directed: bool, name: str, isAncestor: bool) -> None:
         """Constructs instance of POGraph.
@@ -108,19 +108,19 @@ class POGraph(object):
             isAncestor(bool): Identifier for extant or ancestor
         """
 
-        self._version = version
-        self._indices = indices
-        self._nodes = nodes
-        self._start = start
-        self._end = end
-        self._size = size
-        self._terminated = terminated
-        self._directed = directed
-        self._name = name
-        self._isAncestor = isAncestor
+        self.version = version
+        self.indices = indices
+        self.nodes = nodes
+        self.start = start
+        self.end = end
+        self.size = size
+        self.terminated = terminated
+        self.directed = directed
+        self.name = name
+        self.isAncestor = isAncestor
 
     def __str__(self) -> str:
-        return (f"Sequence ID: {self._name}\nSize: {self._size}\nStart: {self._start}\nEnd: {self._end}")
+        return (f"Sequence ID: {self.name}\nSize: {self.size}\nStart: {self.start}\nEnd: {self.end}")
 
 
 def POGraphFromJSON(jpog: dict, isAncestor: bool = False) -> POGraph:
@@ -192,7 +192,7 @@ def POGraphFromJSON(jpog: dict, isAncestor: bool = False) -> POGraph:
                             forward=edge_info["Forward"],
                             weight=edge_info["Weight"])
 
-                cor_node._edges.append(edge)
+                cor_node.edges.append(edge)
 
             else:
 
@@ -204,19 +204,19 @@ def POGraphFromJSON(jpog: dict, isAncestor: bool = False) -> POGraph:
                 cor_node = nodes[node_loc]
 
                 # some edges are identical to adj edges and can be replaced
-                dupe_edges = []
+                dupeedges = []
 
-                for j in range(len(cor_node._edges)):
+                for j in range(len(cor_node.edges)):
 
-                    adjacent_edge = cor_node._edges[j]
+                    adjacent_edge = cor_node.edges[j]
 
-                    if edgeInd[i][0] == adjacent_edge._start and\
-                            edgeInd[i][1] == adjacent_edge._end:
+                    if edgeInd[i][0] == adjacent_edge.start and\
+                            edgeInd[i][1] == adjacent_edge.end:
 
-                        dupe_edges.append(j)
+                        dupeedges.append(j)
 
                 # remove any identified duplicates
-                [cor_node._edges.pop(j) for j in dupe_edges]
+                [cor_node.edges.pop(j) for j in dupeedges]
 
                 edge = Edge(start=edgeInd[i][0],
                             end=edgeInd[i][1],
@@ -226,7 +226,7 @@ def POGraphFromJSON(jpog: dict, isAncestor: bool = False) -> POGraph:
                             forward=edge_info["Forward"],
                             weight=edge_info["Weight"])
 
-                cor_node._edges.append(edge)
+                cor_node.edges.append(edge)
 
     # adds ancestor identifier "N"
     name = jpog["Name"]
