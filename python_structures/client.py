@@ -35,7 +35,8 @@ def sendRequest(message: str) -> str:
         s.sendall(message.encode())
         print("Request sent...\n")
 
-        response = s.recv(1024)
+        response = s.recv(2048)
+        
 
     print("Response ")
     print(f"{response!r}")

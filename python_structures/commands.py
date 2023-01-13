@@ -12,6 +12,7 @@
 
 import json
 import client
+from collections import OrderedDict
 
 ###### FORMATTING######
 
@@ -59,8 +60,8 @@ def serialiseAln(file_name: str) -> dict:
                     if not line:
                         break
 
-                tmp["name"] = key
-                tmp["Seq"] = aln
+                tmp["Name"] = key
+                tmp["Seq"] = [letter for letter in aln]
 
                 seqs.append(tmp)
             else:
@@ -71,6 +72,175 @@ def serialiseAln(file_name: str) -> dict:
     alignments["Datatype"] = {"Predef": "Protein"}
 
     return alignments
+
+
+def find_p(s: str):
+
+    start = s.find('(')
+
+    end = s[::-1].find(')')
+
+    if start == -1 and end == -1:
+        return start, end
+
+    true_end = len(s) - end - 1
+
+    return start, true_end
+
+
+def find_comma(s: str, level: int = 0) -> list[str]:
+
+    mylevel = 0
+    coms = []
+
+    for i in range(len(s)):
+
+        if s[i] == '(':
+            mylevel += 1
+
+        elif s[i] == ')':
+            mylevel -= 1
+        elif s[i] == ',' and mylevel == level:
+            coms.append(i)
+
+    return coms
+
+
+def nwk_split(n: str, family=None) -> OrderedDict:
+
+    if family is None:
+        family = OrderedDict()
+
+    # find the first (children)parent
+    start, end = find_p(n)
+
+    # floor case
+    if start == -1 and end == -1:
+
+        return family
+
+    # split up the children
+    children = n[start+1:end]
+    parent = n[end+1:]
+
+    # find every child within the group
+    coms = find_comma(children)
+
+    sub_strings = []
+
+    # allows the children to be split up into sub strings
+    prev_com = 0
+
+    for i in coms:
+        sub_strings.append(children[prev_com:i])
+        prev_com = i + 1
+
+    sub_strings.append(children[coms[-1]+1:])
+
+    # this will hold children of the current parent
+    current_children = []
+
+    # we must check if the children have children as well
+    for i in sub_strings:
+
+        p_start, p_end = find_p(i)
+
+        if p_start == -1 and p_end == -1:
+
+            # if no children, just save them
+            current_children.append(i)
+
+        else:
+            # break up the children from the paernt
+            current_children.append(i[p_end+1:])
+
+            # repeat but with the children of this child
+            nwk_split(i, family)
+
+    family[parent] = current_children
+
+    return family
+
+
+def cleanNwk(nwk: OrderedDict) -> dict:
+
+    # key assumption here is that if there is no distance then it is the root
+
+    dists = dict()
+    clean_families = dict()
+    labels = []
+
+    for key, values in nwk.items().__reversed__():
+
+        # name:distance
+        seq = key.split(':')
+
+        # case for root
+        if len(seq) == 1:
+            dists[seq[0]] = 0.0
+            labels.append(seq[0])
+
+        else:
+            dists[seq[0]] = float(seq[1])
+
+        children = []
+
+        for child in values:
+
+            # assign distance
+            child = child.split(':')
+            dists[child[0]] = float(child[1])
+
+            # record children of current key
+            children.append(child[0])
+
+            # add to labels in order
+            labels.append(child[0])
+
+        clean_families[seq[0]] = children
+
+    clean_data = {}
+    clean_data["Families"] = clean_families
+    clean_data["Distances"] = dists
+    clean_data["Labels"] = labels
+
+    return clean_data
+
+
+def nwkToJSON(nwk: str) -> dict:
+
+    #remove ;
+    job = nwk[:-1]
+
+    families = nwk_split(job)
+
+    clean = cleanNwk(families)
+
+    idxs = {name: i for i, name in enumerate(clean["Labels"])}
+
+    # PARENTS
+    parents = {}
+
+    for key, value in clean["Families"].items():
+
+        for child in value:
+            parents[child] = idxs[key]
+
+    for key in clean["Families"].keys():
+
+        if key not in parents.keys():
+            parents[key] = -1
+
+    sorted_parents = [int(parents[id]) for id in clean["Labels"]]
+    sorted_distances = [clean["Distances"][id] for id in clean["Labels"]]
+
+    json_idx = dict()
+    json_idx["Parents"] = sorted_parents
+    json_idx["Labels"] = clean["Labels"]
+    json_idx["Distances"] = sorted_distances
+    json_idx["Branchpoints"] = len(clean["Labels"])
+
+    return json_idx
 
 
 ###### REQUESTS######
@@ -166,7 +336,7 @@ def requestPOGTree(aln: str, nwk: str, auth: str = "Guest") -> str:
         for line in f:
             tree += line.strip()
 
-    params["Tree"] = tree
+    params["Tree"] = nwkToJSON(tree)
 
     params["Alignment"] = serialiseAln(aln)
 
@@ -208,7 +378,7 @@ def requestJointReconstruction(aln: str, nwk: str,
         for line in f:
             tree += line.strip()
 
-    params["Tree"] = tree
+    params["Tree"] = nwkToJSON(tree)
     params["Alignment"] = serialiseAln(aln)
 
     params["Inference"] = "Joint"
@@ -222,15 +392,9 @@ def requestJointReconstruction(aln: str, nwk: str,
     return client.sendRequest(j_request)
 
 
-# joint = requestJointReconstruction(
-#     aln="./test_data/small_test_data/test_aln.aln",
-#     nwk="./test_data/small_test_data/test_nwk.nwk")
+# tree = requestJointReconstruction(aln="./test_data/small_test_data/test_aln.aln",
+#                       nwk="./test_data/small_test_data/test_nwk.nwk")
 
-# params["Tree"] = {"Parents": [-1, 0, 1, 1, 3, 4, 4, 6, 6, 3, 9, 10, 10, 9, 0], "Labels": ["0", "1", "A", "2", "3", "B", "4", "C", "D","5", "6", "E", "F", "G", "H"], "Distances": [0, 0.5, 0.6, 3.2, 5, 3.3, 1.8, 1, 2.5, 7, 2.5, 3.9, 4.5, 0.3, 1.1], "Branchpoints": 15}
+requestPlaceInQueue(27)
 
-
-tree = requestPOGTree(aln="./test_data/small_test_data/test_aln.aln",
-                      nwk="./test_data/small_test_data/test_nwk.nwk")
-
-
-print(tree)
+output = requestJobOutput(27)
