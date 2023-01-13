@@ -13,7 +13,6 @@
 
 from typing import Union
 
-
 class BranchPoint(object):
     """Represents a branchpoint on a phylogenetic tree. Can contain
     information about the parents or children of that point and how

@@ -39,4 +39,4 @@ def sendRequest(message: str) -> str:
 
     print("Response ")
     print(f"{response!r}")
-    # return f"Response: {response!r}"
+    return f"Response: {response!r}"

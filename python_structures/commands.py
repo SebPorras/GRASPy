@@ -13,8 +13,10 @@
 import json
 import client
 
+###### FORMATTING######
 
-def serialiseAln(file_name: str) -> list[dict]:
+
+def serialiseAln(file_name: str) -> dict:
     """
     Creates a dictionary where seq ids are the key
     and alignment is the value.
@@ -23,7 +25,7 @@ def serialiseAln(file_name: str) -> list[dict]:
         file_name(str): path to aln file
 
     Returns:
-        list: alignment seqs in JSON format 
+        list: alignment seqs in JSON format
 
     """
 
@@ -64,7 +66,115 @@ def serialiseAln(file_name: str) -> list[dict]:
             else:
                 line = fa.readline()
 
-    return seqs
+    alignments = dict()
+    alignments["Sequences"] = seqs
+    alignments["Datatype"] = {"Predef": "Protein"}
+
+    return alignments
+
+
+###### REQUESTS######
+
+def requestJobOutput(job_id: int) -> str:
+    """Requests the output of a submitted job. Request will be
+    denied if the job is not complete.
+
+    Parameters:
+        job_id(int): The ID of the job
+
+    Returns:
+        str: {"Job":<job-number>, "Result":{<result-JSON>}}
+    """
+
+    request = dict()
+
+    request["Command"] = "Output"
+    request["Job"] = job_id
+
+    j_request = json.dumps(request) + '\n'
+
+    return client.sendRequest(j_request)
+
+
+def requestPlaceInQueue(job_id: int) -> str:
+    """Requests the status of a submitted job
+
+    Parameters:
+        job_id(str): The ID of the job
+
+    Returns:
+        str: bnkit job status
+    """
+
+    request = dict()
+
+    request["Command"] = "Place"
+    request["Job"] = job_id
+
+    j_request = json.dumps(request) + '\n'
+
+    return client.sendRequest(j_request)
+
+
+def requestCancelJob(job_id: int) -> str:
+    """Requests the status of a submitted job
+
+    Parameters:
+        job_id(str): The ID of the job
+
+    Returns:
+        str: bnkit job status
+    """
+
+    request = dict()
+
+    request["Command"] = "Retrieve"
+    request["Job"] = job_id
+
+    j_request = json.dumps(request) + '\n'
+
+    return client.sendRequest(j_request)
+
+
+###### COMMANDS######
+
+
+def requestPOGTree(aln: str, nwk: str, auth: str = "Guest") -> str:
+    """Queries the server to turn an alignment 
+    and a nwk string of a tree into the POGTree format.
+
+    This output JSON can be converted into a POGTree object 
+    via POGTreeFromJSON()
+
+    Parameters:
+        aln(str) = file name of aln file
+        nwk(str) = file name of nwk file
+
+    Returns:
+        str: JSON string of POGTree 
+    """
+
+    request = dict()
+
+    request["Command"] = "Pogit"
+    request["Auth"] = auth
+
+    params = dict()
+
+    with open(nwk, 'r') as f:
+        tree = ""
+        for line in f:
+            tree += line.strip()
+
+    params["Tree"] = tree
+
+    params["Alignment"] = serialiseAln(aln)
+
+    request["Params"] = params
+
+    j_request = json.dumps(request) + '\n'
+
+    return client.sendRequest(j_request)
 
 
 def requestJointReconstruction(aln: str, nwk: str,
@@ -83,7 +193,7 @@ def requestJointReconstruction(aln: str, nwk: str,
         model(str) = Substitution model, defaults to JTT
 
     Returns:
-        str: returns Job ID
+        str: {"Message":"Queued","Job":<job-number>}
     """
 
     request = dict()
@@ -99,70 +209,28 @@ def requestJointReconstruction(aln: str, nwk: str,
             tree += line.strip()
 
     params["Tree"] = tree
-    params["Alignments"] = serialiseAln(aln)
+    params["Alignment"] = serialiseAln(aln)
+
     params["Inference"] = "Joint"
     params["Indels"] = indels
     params["Model"] = model
 
-    request["Parameters"] = params
-
-    j_request = json.dumps(request) + '\n'
-    print("j_request")
-
-    print(j_request)
-
-    return client.sendRequest(j_request)
-
-
-def requestJobStatus(job_id: str, auth: str = "Guest") -> str:
-    """Requests the status of a submitted job
-
-    Parameters:
-        job_id(str): The ID of the job 
-        auth(str): Authentication token, defaults to Guest
-
-    Returns:
-        str: bnkit job status  
-    """
-
-    request = dict()
-
-    request["Command"] = "JobStatus"
-    request["Auth"] = auth
-    request["Job"] = job_id
+    request["Params"] = params
 
     j_request = json.dumps(request) + '\n'
 
     return client.sendRequest(j_request)
 
 
-def requestJobResult(job_id: str, auth: str = "Guest") -> str:
-    """Requests the output of a submitted job. Request will be 
-    denied if the job is not complete. 
+# joint = requestJointReconstruction(
+#     aln="./test_data/small_test_data/test_aln.aln",
+#     nwk="./test_data/small_test_data/test_nwk.nwk")
 
-    Parameters:
-        job_id(str): The ID of the job 
-        auth(str): Authentication token, defaults to Guest
-
-    Returns:
-        str: Bnkit response for completed job 
-    """
-
-    request = dict()
-
-    request["Command"] = "JobResult"
-    request["Auth"] = auth
-    request["Job"] = job_id
-
-    j_request = json.dumps(request) + '\n'
-
-    return client.sendRequest(j_request)
+# params["Tree"] = {"Parents": [-1, 0, 1, 1, 3, 4, 4, 6, 6, 3, 9, 10, 10, 9, 0], "Labels": ["0", "1", "A", "2", "3", "B", "4", "C", "D","5", "6", "E", "F", "G", "H"], "Distances": [0, 0.5, 0.6, 3.2, 5, 3.3, 1.8, 1, 2.5, 7, 2.5, 3.9, 4.5, 0.3, 1.1], "Branchpoints": 15}
 
 
-joint = requestJointReconstruction(
-    aln="./test_data/small_test_data/test_aln.aln",
-    nwk="./test_data/small_test_data/test_nwk.nwk")
+tree = requestPOGTree(aln="./test_data/small_test_data/test_aln.aln",
+                      nwk="./test_data/small_test_data/test_nwk.nwk")
 
-#jobStatus = requestJobStatus("ABC123")
 
-# JobResult = requestJobResult("ABC123")
+print(tree)
