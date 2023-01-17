@@ -36,7 +36,6 @@ def sendRequest(message: str) -> str:
         print("Request sent...\n")
 
         response = s.recv(2048)
-        
 
     print("Response ")
     print(f"{response!r}")
