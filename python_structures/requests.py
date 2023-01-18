@@ -112,7 +112,7 @@ def requestPOGTree(aln: str, nwk: str, auth: str = "Guest") -> str:
 
     params["Tree"] = nwkToJSON(tree)
 
-    params["Alignment"] = readAln(aln, "Protein")
+    params["Alignment"] = alnToJSON(aln, "Protein")
 
     request["Params"] = params
 
@@ -153,11 +153,11 @@ def requestJointReconstruction(aln: str, nwk: str,
             tree += line.strip()
 
     params["Tree"] = nwkToJSON(tree)
-    params["Alignment"] = readAln(aln, "Protein")
+    params["Alignment"] = alnToJSON(aln, "Protein")
 
-    params["Inference"] = "Joint"
-    params["Indels"] = indels
-    params["Model"] = model
+    # params["Inference"] = "Joint"
+    # params["Indels"] = indels
+    # params["Model"] = model
 
     request["Params"] = params
 
@@ -166,14 +166,10 @@ def requestJointReconstruction(aln: str, nwk: str,
     return client.sendRequest(j_request)
 
 
-tree = requestJointReconstruction(aln="./test_data/big_test_data/GRASPTutorial_Final.aln",
-                                  nwk="./test_data/big_test_data/GRASPTutorial_Final.nwk")
-
+# tree = requestJointReconstruction(aln="./test_data/big_test_data/GRASPTutorial_Final.aln",
+#                                   nwk="./test_data/big_test_data/GRASPTutorial_Final.nwk")
 
 # tree = requestJointReconstruction(aln="./test_data/big_test_data/GRASPTutorial_Final.aln",
 #                                   nwk="./test_data/big_test_data/_ancestors.nwk")
 
-# print(tree)
-# requestPlaceInQueue(29)
-
-# output = requestJobOutput(32)
+# requestPlaceInQueue(4)

@@ -21,7 +21,6 @@ def sendRequest(message: str) -> str:
         Response from bnkit server
     """
 
-    #HOST = "127.0.0.1"
     HOST = '10.139.1.21'
 
     PORT = 4072

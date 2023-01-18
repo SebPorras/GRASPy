@@ -63,7 +63,7 @@ class POGTree(object):
 
     def writeNwk(self, file_name: str, root: str = "N0") -> str:
         """Writes a nwk string of the tree to a file
-        
+
         Parameters: 
 
             file_name(str): name of nwk file
@@ -123,5 +123,3 @@ if __name__ == "__main__":
     #     # if None in i.children:
     #     print(i)
     #     print()
-
-  

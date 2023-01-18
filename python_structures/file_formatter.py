@@ -4,9 +4,17 @@
 # Aims: These functions perform formatting on all input file for a request
 # to the GRASP server. Visit to commands.py to see their usage.
 ###############################################################################
+from typing import Tuple
 
 
-def _find_p(s: str):
+def _find_p(s: str) -> Tuple[int, int]:
+    """Locates the first index positions for the top most
+    embedding within a nwk string. This allows substrings 
+    to be located
+    For example: 
+
+    (A:1,(B:2)C:3)D:4; -> 0, 13
+    """
 
     start = s.find('(')
 
@@ -21,6 +29,19 @@ def _find_p(s: str):
 
 
 def _find_comma(s: str, level: int = 0) -> list[int]:
+    """
+    Finds all commas within a particular embedding level for 
+    a nwk string. This essentially locates where children are 
+    to allow subsetting of the string. 
+
+    Parameters:
+        s(str): nwk string 
+        level(int): current embedding level 
+
+    Returns:
+        list: contains indices for each comma within 
+        the embedding
+    """
 
     mylevel = 0
     coms = []
@@ -39,154 +60,120 @@ def _find_comma(s: str, level: int = 0) -> list[int]:
     return coms
 
 
-def _make_label(child, idx, count):
+def _make_label(child: str, isLabeled: bool, idx: int, count: int) -> str:
+    """
+    Used within the _nwk_split method to create labels for nodes.
 
-    if child[idx+1:].split(":")[0] == "":
-        label = "N" + str(count) + child[idx+1:]
+    Parameters:
+        child(str): current child 
+        isLabeled(bool): if the child has a label or not 
+        idx(int): marks where the child label begins
+        count(int): the current ancestor node count 
+
+    Returns:
+        str: The label of the node 
+    """
+
+    if isLabeled:
+        label = str(count) + \
+            ":" + child[idx+1:].split(":")[1]
 
     else:
-        label = child
+        label = str(count) + child[idx+1:]
 
     return label
 
 
-def _nwk_split(n: str, visited=None, count=None, anc_count=None) -> dict:
+def _nwk_split(n: str, data=None, isLabeled=False) -> dict:
+    """Performs a depth first search (DFS) of a nwk string and records
+    the order of sequences and the parent of each node. Note the 
+    recursive nature of the function. 
 
-    # keep track of order of visited nodes in DFS
-    if visited is None:
-        visited = dict()
-        visited["order"] = []
+    Parameters:
+        n(str): The nwk string 
+        data(None): will record tree info during DFS
+        isLabeled(bool): marks if internal nodes have 
+        been assigned labels or not. 
 
-    if count is None:
-        count = 0
+    Returns:
+        dict: contains order and parents for each node
+    """
 
-    # ancestor count which allows labeling
-    if anc_count is None:
-        anc_count = []
+    if data is None:
+        data = dict()
+        data["order"] = []
+        data["count"] = 0
+        data["Parents"] = {}
 
+    # locates the first embedding in a nwk string
     start, end = _find_p(n)
 
-    # base case for extant
-    if start == -1 and end == -1:
-        parent = n
+    # Assigns an internal node a number starting with 0 at the root
 
-    # case for ancestor node
-    else:
-        parent = "N" + str(count) + n[end+1:]
-        anc_count.append(count)
-        count += 1
+    parent = _make_label(n, isLabeled, end, data["count"])
 
-    visited["order"].append(parent)
+    data["order"].append(parent)
 
+    # Grabs all children of this ancestor
     children = n[start+1: end]
 
-    # Splits up subtree into children
-
+    # finds all children for current embedding
     coms = _find_comma(children)
 
     sub_strings = []
 
     prev_com = 0
 
-    # record children of this parent
-    if len(coms) == 0:
-
-        return visited
-
+    # save each child and any children it has
     for i in coms:
 
         sub_strings.append(children[prev_com: i])
         prev_com = i + 1
 
     sub_strings.append(children[coms[-1]+1:])
-    ##################################
 
-    # now check these children for their children
+    # now check these children for their own children
     for child in sub_strings:
 
-        _, p_end = _find_p(child)
+        # look for the next embedding within "(...)"
+        p_start, p_end = _find_p(child)
 
-        if count not in anc_count:
+        # this is the base case for an extant sequence
+        if p_start == -1 and p_end == -1:
 
-            label = _make_label(child, p_end, count)
+            data["order"].append(child)
 
-            visited[label] = parent
+            # record the parent of this current child
+            data["Parents"][child] = parent
 
-            _nwk_split(child, visited, count, anc_count)
-
-        # this loop here avoids count reverting back
-        # to its value further up the tree
         else:
-            while (count in anc_count):
-                count += 1
 
-            label = _make_label(child, p_end, count)
+            # implies another ancestor has been found
+            data["count"] += 1
 
-            visited[label] = parent
+            label = _make_label(child, isLabeled, p_end, data["count"])
 
-            _nwk_split(child, visited, count, anc_count)
+            data["Parents"][label] = parent
 
-    return visited
+            # repeat on the next ancestor
+            _nwk_split(child, data, isLabeled)
 
-
-def _nwk_split_labels(n: str, visited=None, count=None, anc_count=None) -> dict:
-
-    # keep track of order of visited nodes in DFS
-    if visited is None:
-        visited = dict()
-        visited["order"] = []
-
-    start, end = _find_p(n)
-
-    # base case for extant
-    if start == -1 and end == -1:
-        parent = n
-
-    # case for ancestor node
-    else:
-        parent = n[end+1:]
-
-    visited["order"].append(parent)
-
-    children = n[start+1: end]
-
-    # Splits up subtree into children
-
-    coms = _find_comma(children)
-
-    sub_strings = []
-
-    prev_com = 0
-
-    # record children of this parent
-    if len(coms) == 0:
-
-        return visited
-
-    for i in coms:
-
-        sub_strings.append(children[prev_com: i])
-        prev_com = i + 1
-
-    sub_strings.append(children[coms[-1]+1:])
-    ##################################
-
-    # now check these children for their children
-    for child in sub_strings:
-
-        _, p_end = _find_p(child)
-
-        label = child[p_end+1:]
-
-        visited[label] = parent
-
-        _nwk_split_labels(child, visited, count, anc_count)
-
-    return visited
+    return data
 
 
 def nwkToJSON(nwk: str) -> dict:
-    """Assumes that internal nodes have not been added"""
+    """Parses a nwk string into a JSON format.
+    This method assumes that a tree either has no names for internal 
+    nodes OR that the internal nodes have been named according to 
+    GRASP's naming system i.e. N0, N1 etc.   
+
+    Parameters:
+        nwk(str): A nwk string 
+
+    Returns:
+        dict: Contains a representation of an IdxTree in
+        JSON format. 
+    """
 
     # find the first ')' to locate the root
     end = len(nwk) - nwk[::-1].find(")")
@@ -194,7 +181,7 @@ def nwkToJSON(nwk: str) -> dict:
     # no internal node labels or root distance
     if nwk[end:] == ";":
 
-        # remove ; and add root distance
+        # remove ;  and add root distance
         job = nwk[:-1] + ":0"
 
         raw_tree = _nwk_split(job)
@@ -207,30 +194,33 @@ def nwkToJSON(nwk: str) -> dict:
         raw_tree = _nwk_split(job)
 
     # for nwk output from a GRASP job e.g ...)N0;
-    elif nwk[end:].split(":")[0] != "N0":
+    elif nwk[end:].split(":")[0] != "":
 
-        job = nwk[:-1] + ":0"
+        job = nwk[:-1]
 
-        raw_tree = _nwk_split_labels(job)
+        raw_tree = _nwk_split(job, isLabeled=True)
 
     else:
         raise RuntimeError("nwk in unsupported or incorrect format")
 
     idxs = {name: i for i, name in enumerate(raw_tree["order"])}
+
     Parents = []
     Labels = []
     Distances = []
 
-    for name in raw_tree["order"]:
+    for i, node in enumerate(raw_tree["order"]):
 
-        Labels.append(name.split(":")[0])
+        Labels.append(node.split(":")[0])
+        Distances.append(float(node.split(":")[1]))
 
-        Distances.append(float(name.split(":")[1]))
-
-        if name.split(":")[0] == "N0":
-            Parents.append(-1)
+        if i == 0:
+            p_idx = -1
         else:
-            Parents.append(idxs[raw_tree[name]])
+            # grab the index of the parent for this node
+            p_idx = idxs[(raw_tree["Parents"][node])]
+
+        Parents.append(p_idx)
 
     json_idx = dict()
     json_idx["Parents"] = Parents
@@ -241,7 +231,7 @@ def nwkToJSON(nwk: str) -> dict:
     return json_idx
 
 
-def readAln(file_name: str, data_type: str) -> dict:
+def alnToJSON(file_name: str, data_type: str) -> dict:
     """
     Creates a dictionary where seq ids are the key
     and alignment is the value.
@@ -249,7 +239,7 @@ def readAln(file_name: str, data_type: str) -> dict:
     Parameters:
         file_name(str): path to aln file
         data_type(str): user must specify what alignment letters are.
-        E.g DNA or Protein 
+        E.g DNA or Protein
 
     Returns:
         list: alignment seqs in JSON format
@@ -287,7 +277,16 @@ def readAln(file_name: str, data_type: str) -> dict:
                         break
 
                 tmp["Name"] = key
-                tmp["Seq"] = [letter for letter in aln]
+
+                sequence = []
+
+                for letter in aln:
+                    if letter == "-":
+                        sequence.append(None)
+                    else:
+                        sequence.append(letter)
+
+                tmp["Seq"] = sequence
 
                 seqs.append(tmp)
             else:
