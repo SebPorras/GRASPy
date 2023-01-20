@@ -1,25 +1,21 @@
-############################################
-# Date: 9/1/23
-# Author: Sebastian Porras
-# Aims: params class to convert aln and nwk to JSON for socket
-#####################################################################
 
-############################################
-# Date: 10/1/23
+###############################################################################
+# Date: 20/1/23
 # Author: Sebastian Porras
-# Aims: Starting to create formats for requests to the bnkit server
-#####################################################################
-
+# Aims: This file contains all the protocols that the client can use to
+# obtain information about a job or the server. It only contains the requests
+# that the user can ask of the server.
+###############################################################################
 
 import json
 import client
-from file_formatter import *
+from parsers import *
 
 
 ###### REQUESTS######
 
 
-def requestJobOutput(job_id: int) -> str:
+def requestJobOutput(job_id: int) -> dict:
     """Requests the output of a submitted job. Request will be
     denied if the job is not complete.
 
@@ -37,7 +33,9 @@ def requestJobOutput(job_id: int) -> str:
 
     j_request = json.dumps(request) + '\n'
 
-    return client.sendRequest(j_request)
+    response = client.sendRequest(j_request)
+
+    return json.loads(response)
 
 
 def requestPlaceInQueue(job_id: int) -> str:
@@ -47,7 +45,7 @@ def requestPlaceInQueue(job_id: int) -> str:
         job_id(str): The ID of the job
 
     Returns:
-        str: bnkit job status
+        str: {"Job":<job-number>, "Place":{<place>}}
     """
 
     request = dict()
@@ -57,7 +55,9 @@ def requestPlaceInQueue(job_id: int) -> str:
 
     j_request = json.dumps(request) + '\n'
 
-    return client.sendRequest(j_request)
+    response = client.sendRequest(j_request)
+
+    return response
 
 
 def requestCancelJob(job_id: int) -> str:
@@ -67,7 +67,7 @@ def requestCancelJob(job_id: int) -> str:
         job_id(str): The ID of the job
 
     Returns:
-        str: bnkit job status
+        str: {"Job":<job-number>}
     """
 
     request = dict()
@@ -80,22 +80,42 @@ def requestCancelJob(job_id: int) -> str:
     return client.sendRequest(j_request)
 
 
+def requestViewQueue() -> dict:
+    """Lists all the jobs currently being 
+    performed by the server 
+
+
+    Returns:
+        str: summary of current jobs in the server 
+    """
+
+    request = dict()
+
+    request["Command"] = "Status"
+
+    j_request = json.dumps(request) + '\n'
+
+    response = client.sendRequest(j_request)
+
+    return json.loads(response)
+
 ###### COMMANDS######
 
 
-def requestPOGTree(aln: str, nwk: str, auth: str = "Guest") -> str:
+def requestPOGTree(aln: str, nwk: str, auth: str = "Guest") -> dict:
     """Queries the server to turn an alignment
-    and a nwk string of a tree into the POGTree format.
+    and a nwk file into the POGTree format with POGraphs for extants.
 
     This output JSON can be converted into a POGTree object
     via POGTreeFromJSON()
 
     Parameters:
-        aln(str) = file name of aln file
-        nwk(str) = file name of nwk file
+        aln(str) = path to file name of aln 
+        nwk(str) = path to or file name of nwk 
 
     Returns:
-        str: JSON string of POGTree
+        dict: Will complete the job and provide a POG graph of the
+        extants and a tree or will provide the job number if queued. 
     """
 
     request = dict()
@@ -118,23 +138,32 @@ def requestPOGTree(aln: str, nwk: str, auth: str = "Guest") -> str:
 
     j_request = json.dumps(request) + '\n'
 
-    return client.sendRequest(j_request)
+    j_response = client.sendRequest(j_request)
+
+    response = json.loads(j_response)
+
+    return response
 
 
 def requestJointReconstruction(aln: str, nwk: str,
                                auth: str = "Guest",
                                indels: str = "BEP",
-                               model: str = "JTT"):
+                               model: str = "JTT",
+                               alphabet: str = "Protein") -> str:
     """Queries the bnkit server for a joint reconstruction.
     Will default to standard bnkit reconstruction parameters which
     use BEP for indels and JTT for the substitution model.
 
+    Currently ONLY implemented for protein alphabets. Future version
+    will guess unless user specifies alphabet. 
+
     Parameters:
-        aln(str) = file name of aln file
-        nwk(str) = file name of nwk file
+        aln(str) = path to file name of aln 
+        nwk(str) = path to file name of nwk 
         auth(str) = Authentication token, defaults to Guest
         indels(str) = Indel mode, defaults to BEP
         model(str) = Substitution model, defaults to JTT
+        alphabet(str) = Sequence type. e.g. DNA or Protein 
 
     Returns:
         str: {"Message":"Queued","Job":<job-number>}
@@ -153,23 +182,16 @@ def requestJointReconstruction(aln: str, nwk: str,
             tree += line.strip()
 
     params["Tree"] = nwkToJSON(tree)
-    params["Alignment"] = alnToJSON(aln, "Protein")
+    params["Alignment"] = alnToJSON(aln, alphabet)
 
-    # params["Inference"] = "Joint"
-    # params["Indels"] = indels
-    # params["Model"] = model
+    params["Inference"] = "Joint"
+    params["Indels"] = indels
+    params["Model"] = model
 
     request["Params"] = params
 
     j_request = json.dumps(request) + '\n'
 
-    return client.sendRequest(j_request)
+    response = client.sendRequest(j_request)
 
-
-# tree = requestJointReconstruction(aln="./test_data/big_test_data/GRASPTutorial_Final.aln",
-#                                   nwk="./test_data/big_test_data/GRASPTutorial_Final.nwk")
-
-# tree = requestJointReconstruction(aln="./test_data/big_test_data/GRASPTutorial_Final.aln",
-#                                   nwk="./test_data/big_test_data/_ancestors.nwk")
-
-# requestPlaceInQueue(4)
+    return response

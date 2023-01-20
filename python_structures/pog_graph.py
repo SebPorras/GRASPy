@@ -1,13 +1,12 @@
 ###############################################################################
 # Date: 13/12/22
 # Author: Sebastian Porras
-# Aims: Trying to implement python version of the POG graph.
-# To do:
-# 1) Create a sym node class for annotating
-# 2) Create a POG graph class
+# Aims: Contains all the data structures for a POG graph.
+# A POGraph contains SymNodes that represent characters within a sequence.
+# Within these nodes there are Edges which contain information about
+# how these SymNodes are connected to one another.
 ###############################################################################
 
-import numpy as np
 from numpy.typing import NDArray
 from typing import Optional
 
@@ -121,120 +120,3 @@ class POGraph(object):
 
     def __str__(self) -> str:
         return (f"Sequence ID: {self.name}\nSize: {self.size}\nStart: {self.start}\nEnd: {self.end}")
-
-
-def POGraphFromJSON(jpog: dict, isAncestor: bool = False) -> POGraph:
-    """Takes JSON format of a partial order graph and transcribes
-    this information into a POGraph object.
-
-    Parameters:
-        jpog(dict): serialised JSON format of a POG for a sequence
-
-        isAncestor(bool): Only ancestors have multiple edges unlike
-        extants which only have adjacent edges.
-    """
-
-    # each position in a sequence is given an index based on the alignment
-    indices = np.array(jpog["Indices"])
-
-    # adjacent edges start at each index and end at value stored there
-    adj = jpog["Adjacent"]
-
-    if len(indices) != len(adj):
-        raise RuntimeError("JSON is incorrectly formatted")
-
-    # contains outgoing edges and the most likely residue
-    node_vals = jpog["Nodes"]
-    nodes = []
-
-    for i in range(len(indices)):
-
-        es = []
-
-        # set [] to -999 to signify end of seq
-        if len(adj[i]) == 0:
-            edge = Edge(start=indices[i], end=-999)
-            es.append(edge)
-        else:
-            # there can be multiple adjacent edges for each sequence position
-            for j in range(len(adj[i])):
-
-                edge = Edge(start=indices[i], end=adj[i][j])
-                es.append(edge)
-
-        node = SymNode(name=indices[i],
-                       value=node_vals[i]["Value"], edges=es)
-
-        nodes.append(node)
-
-    if isAncestor:
-
-        # tuple of start and end of each edge
-        edgeInd = jpog["Edgeindices"]
-
-        # extra annotations about each edge
-        edges = jpog["Edges"]
-
-        for i in range(len(jpog["Edgeindices"])):
-
-            edge_info = edges[i]
-
-            # virtual start is always referenced as -1
-            if edgeInd[i][0] == -1:
-
-                # virtual start edges will be assigned to the first "real" node
-                cor_node = nodes[0]
-
-                edge = Edge(start=edgeInd[i][0], end=edgeInd[i][1],
-                            edgeType=jpog["Edgetype"],
-                            recip=edge_info["Recip"],
-                            backward=edge_info["Backward"],
-                            forward=edge_info["Forward"],
-                            weight=edge_info["Weight"])
-
-                cor_node.edges.append(edge)
-
-            else:
-
-                # edges are stored in random order, need to find correct start
-
-                # returns a tuple with an array containg correct index
-                node_loc = np.where(indices == edgeInd[i][0])[0][0]
-
-                cor_node = nodes[node_loc]
-
-                # some edges are identical to adj edges and can be replaced
-                dupeedges = []
-
-                for j in range(len(cor_node.edges)):
-
-                    adjacent_edge = cor_node.edges[j]
-
-                    if edgeInd[i][0] == adjacent_edge.start and\
-                            edgeInd[i][1] == adjacent_edge.end:
-
-                        dupeedges.append(j)
-
-                # remove any identified duplicates
-                [cor_node.edges.pop(j) for j in dupeedges]
-
-                edge = Edge(start=edgeInd[i][0],
-                            end=edgeInd[i][1],
-                            edgeType=jpog["Edgetype"],
-                            recip=edge_info["Recip"],
-                            backward=edge_info["Backward"],
-                            forward=edge_info["Forward"],
-                            weight=edge_info["Weight"])
-
-                cor_node.edges.append(edge)
-
-    # adds ancestor identifier "N"
-    name = jpog["Name"]
-
-    if name.isdigit():
-        name = "N" + name
-
-    return POGraph(version=jpog["GRASP_version"], indices=indices,
-                   start=jpog["Starts"], end=jpog["Ends"], size=jpog["Size"],
-                   terminated=jpog["Terminated"], directed=jpog["Directed"],
-                   name=name, isAncestor=isAncestor, nodes=nodes)

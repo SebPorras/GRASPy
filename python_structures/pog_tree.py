@@ -7,9 +7,11 @@
 # are in agreement with each other.
 #################################################################################
 
-import json
+
 from pog_graph import *
 from idx_tree import *
+import python_structures.parsers as parsers
+from typing import Union
 
 
 class POGTree(object):
@@ -31,10 +33,9 @@ class POGTree(object):
         self.idxTree = idxTree
         self.graphs = POGraphs
 
-    def pogToNwk(self, root: str = "N0",) -> str:
-        """Writes the tree including ancestors in the
-        Newick Standard (nwk) format. Root is based on
-        sequence ID.
+    def POGTreeToNwk(self, root: str = "N0",) -> str:
+        """Converts the POGTree to nwk form Newick Standard (nwk) format.
+        Root can be changed if the user wishes to create subtrees.
 
         Parameters:
             root(str): Default set to N0 at the "root" ancestor
@@ -53,7 +54,7 @@ class POGTree(object):
         else:
 
             for c in self.idxTree.branchpoints[root].children:
-                nwk += self.pogToNwk(self.idxTree.branchpoints[c].id) + ','
+                nwk += self.POGTreeToNwk(self.idxTree.branchpoints[c].id) + ','
 
             # slicing removes final ',' at end of subtree
             nwk = "(" + nwk[:-1] + \
@@ -61,7 +62,7 @@ class POGTree(object):
 
         return nwk
 
-    def writeNwk(self, file_name: str, root: str = "N0") -> str:
+    def writeToNwk(self, file_name: str, root: str = "N0") -> str:
         """Writes a nwk string of the tree to a file
 
         Parameters: 
@@ -72,54 +73,9 @@ class POGTree(object):
             but can be changed to create subtrees if desired. 
         """
 
-        nwk = self.pogToNwk(root) + ';'
+        nwk = self.POGTreeToNwk(root) + ';'
 
         with open(file_name, 'w') as f:
             f.write(nwk)
 
         return nwk
-
-
-def POGTreeFromJSON(json_path: str) -> POGTree:
-    """Instantiates a POGTree object from a JSON file.
-
-    Parameters:
-        json_path (json): path to JSON file
-    """
-
-    with open(json_path, "r") as file:
-        data = json.load(file)
-
-    tree = IdxTreeFromJSON(data)
-
-    extants = data["Input"]["Extants"]
-    ancestors = data["Ancestors"]
-
-    graphs = dict()
-
-    for e in extants:
-
-        g = POGraphFromJSON(e, isAncestor=False)
-
-        graphs[g.name] = g
-
-    for a in ancestors:
-
-        g = POGraphFromJSON(a, isAncestor=True)
-
-        graphs[g.name] = g
-
-    return POGTree(idxTree=tree, POGraphs=graphs)
-
-
-if __name__ == "__main__":
-
-    poggers = POGTreeFromJSON("./test_data/small_test_data/ASR.json")
-    print(poggers.idxTree.branchpoints["N0"].children)
-    # print(poggers.pogToNwk())
-
-    # print(poggers.graphs['XP_004050792.2'].version)
-    # for i in poggers.idxTree.branchpoints:
-    #     # if None in i.children:
-    #     print(i)
-    #     print()
