@@ -145,11 +145,11 @@ def requestPOGTree(aln: str, nwk: str, auth: str = "Guest") -> dict:
     return response
 
 
-def requestJointReconstruction(aln: str, nwk: str,
-                               auth: str = "Guest",
-                               indels: str = "BEP",
-                               model: str = "JTT",
-                               alphabet: str = "Protein") -> str:
+def JointReconstruction(aln: str, nwk: str,
+                        auth: str = "Guest",
+                        indels: str = "BEP",
+                        model: str = "JTT",
+                        alphabet: str = "Protein") -> str:
     """Queries the bnkit server for a joint reconstruction.
     Will default to standard bnkit reconstruction parameters which
     use BEP for indels and JTT for the substitution model.

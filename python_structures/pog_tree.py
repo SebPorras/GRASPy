@@ -10,8 +10,6 @@
 
 from pog_graph import *
 from idx_tree import *
-import python_structures.parsers as parsers
-from typing import Union
 
 
 class POGTree(object):
@@ -33,7 +31,7 @@ class POGTree(object):
         self.idxTree = idxTree
         self.graphs = POGraphs
 
-    def POGTreeToNwk(self, root: str = "N0",) -> str:
+    def _POGTreeToNwk(self, root: str = "N0",) -> str:
         """Converts the POGTree to nwk form Newick Standard (nwk) format.
         Root can be changed if the user wishes to create subtrees.
 
@@ -54,7 +52,8 @@ class POGTree(object):
         else:
 
             for c in self.idxTree.branchpoints[root].children:
-                nwk += self.POGTreeToNwk(self.idxTree.branchpoints[c].id) + ','
+                nwk += self._POGTreeToNwk(
+                    self.idxTree.branchpoints[c].id) + ','
 
             # slicing removes final ',' at end of subtree
             nwk = "(" + nwk[:-1] + \
@@ -73,7 +72,7 @@ class POGTree(object):
             but can be changed to create subtrees if desired. 
         """
 
-        nwk = self.POGTreeToNwk(root) + ';'
+        nwk = self._POGTreeToNwk(root) + ';'
 
         with open(file_name, 'w') as f:
             f.write(nwk)

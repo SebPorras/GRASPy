@@ -58,17 +58,17 @@ class IdxTree(object):
         Parameters:
             nBranchs(int): number of branch points in the tree
 
-            branchpoints(Array): Contains BranchPoint objects
+            branchpoints(dict[str, BranchPoint]): Contains BranchPoint objects
 
-            parents(Array): maps the index of the child to the index
+            parents(list[int]): maps the index of the child to the index
             of the parent
 
-            children(Array): maps the index of the parent to an array
+            children(list[list[Union[int, None]]]): maps the index of the parent to an array
             containing the indexes the child/children
 
-            indices(dict): Maps the sequence ID to the index on the tree
+            indices(dict[str, int]): Maps the sequence ID to the index on the tree
 
-            distances(Array): Maps the branchpoint to the distance to its parent
+            distances(list[float]): Maps the branchpoint to the distance to its parent
         """
 
         self.nBranches = nBranches
