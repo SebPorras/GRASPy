@@ -5,9 +5,145 @@ Predictions
 
 Read the paper [here](https://doi.org/10.1371/journal.pcbi.1010633)
 
-## Commands 
+## Requests 
 - GRASPy interacts with our servers via sockets. The following commands can be 
 used to submit and retrieve your jobs.
+
+
+### requestPlaceInQueue  
+
+    g_requests.requestPlaceInQueue(job_id:str)
+
+Requests the place in queue of a submitted job.
+
+Parameters:
+
+> * job\_id(str): The ID of the job 
+
+Returns: 
+
+> str: {"Job":<job-number>, "Result":{<result-JSON>}} 
+
+Example
+
+```console
+
+>>> g_requests.requestPlaceInQueue(job_id=19)
+
+Socket created...
+
+Connecting to server...
+
+Socket connected to 10.139.1.21 on IP 4072
+
+Closing socket...
+
+'{"Job":19,"Place":0}
+```
+
+### requestJobOutput 
+
+    g_requests.requestJobResult(job_id: str) 
+
+Requests the output of a submitted job. Request will be 
+denied if the job is not complete. 
+
+Parameters:
+
+> * job\_id(str): The ID of the job 
+
+Returns:
+
+> str: {"Job":<job-number>, "Result":{<result-JSON>}}
+
+Example
+
+```console
+
+>>>g_requests.requestJobResult(19) 
+
+Socket created...
+
+Connecting to server...
+
+Socket connected to 10.139.1.21 on IP 4072
+
+Closing socket...
+
+```
+
+
+### requestViewQueue 
+
+    g_requests.requestViewQueue() 
+
+Lists all the jobs currently being 
+performed by the server 
+
+Parameters:
+
+> * job\_id(str): The ID of the job 
+
+Returns:
+
+> str: {"Job":<job-number>, "Result":{<result-JSON>}}
+
+Example
+
+```console
+
+>>>g_requests.requestJobResult(19) 
+
+Socket created...
+
+Connecting to server...
+
+Socket connected to 10.139.1.21 on IP 4072
+
+{'Jobs': [{'Status': 'COMPLETED','Threads': 1, 'Command': 'Recon','Priority': 0, 
+'Memory': 1, 'Auth': 'Guest','Job': 1, 'Place': 0},{'Status': 'COMPLETED',
+'Threads': 1,'Command': 'Recon','Priority': 0,'Memory': 1, 'Auth': 'Guest',
+'Job': 2,'Place': 0}]}
+
+Closing socket...
+
+```
+
+
+### requestCancelJob 
+
+    g_requests.requestCancelJob(job_id: str) 
+
+Requests the status of a submitted job.
+
+Parameters:
+
+> * job\_id(str): The ID of the job 
+
+Returns:
+
+> str: {"Job":<job-number>}
+
+Example
+
+```console
+
+>>>g_requests.requestCancelJob(19) 
+
+Socket created...
+
+Connecting to server...
+
+Socket connected to 10.139.1.21 on IP 4072
+
+{'Job': 19}
+
+Closing socket...
+
+```
+
+
+## Commands
 
 ### requestJointReconstruction
 
@@ -34,66 +170,16 @@ Example
 ```console 
 >>> requestJointReconstruction(aln="test_aln.aln", nwk="test_nwk.nwk")
 
-Establishing connectoin...
+Socket created...
 
-Request sent...
+Connecting to server...
 
-Your job ID is: 123ABC
-```
+Socket connected to 10.139.1.21 on IP 4072
 
-### requestJobStatus
+Closing socket...
 
-    commands.requestJobStatus(job_id: str, auth: str = "Guest")
+{"Message":"Queued","Job":19}
 
-Requests the status of a submitted job. 
-
-Parameters:
-
-> * job\_id(str): The ID of the job 
-> * auth(str): Authentication token, defaults to Guest
-
-Returns: 
-
-> str: returns job status 
-
-Example
-
-```console 
->>> requestJobStatus(job_id = "ABC123", auth = "Guest")
-
-Establishing connection...
-
-Request sent...
-
-Your job status is: <Job_status>
-```
-
-### requestJobResult 
-
-    commands.requestJobResult(job_id: str, auth: str = "Guest")
-
-Requests the output of a submitted job. Request will be 
-denied if the job is not complete. 
-
-Parameters:
-
-> * job\_id(str): The ID of the job 
-> * auth(str): Authentication token, defaults to Guest
-
-Returns:
-
-> str: returns completed job 
-
-Example
-
-```console 
->>> requestJobResult(job_id = "ABC123", auth = "Guest")
-
-Establishing connection...
-
-Request sent...
-
-Your job result is: <job_output>
 ```
 
 ## Data Structures
@@ -132,9 +218,9 @@ Parameters:
 > * POGraphs(dict): maps sequence IDs to POGraph class  
 
 
-#### writeNwk 
+#### writeToNwk 
 
-    pog_tree.writeNwk(file_name: str, root: str = "N0")
+    pog_tree.writeToNwk(file_name: str, root: str = "N0")
 
 Converts the POGTree object into a nwk string and writes this to a file 
 
@@ -144,7 +230,7 @@ Parameters:
 > * root(str): Default set to N0 at the "root" ancestor but can be changed to internal nodes to create subtrees if desired.
 
 Returns: 
-> str: The nwk string that was written to the file
+> str: The POGTree in nwk format 
 
 Example
 
@@ -155,33 +241,36 @@ Example
 (XP_004050792.2:0.040380067,XP_005216113.1:0.028035396,(XP_018963554.1:0.016721581,XP_016357833.1:0.024301326)N1:0.347992941)N0:0;
 ```
 
-
-#### template  
-
-    pog_tree.writeNwk(file_name: str, root: str = "N0")
-
-Converts the POGTree object into a nwk string and writes this to a file 
-
-    Parameters:
-
-file\_name(str) : name of nwk file 
-    
-root(str): Default set to N0 at the "root" ancestor but can be changed to internal nodes to create subtrees if desired.
-
-Returns: 
-    str: The nwk string that was written to the file
-
-Example
-
-```console 
->>> tree = POGTree(nwk.nwk, aln.aln)
->>> nwk = tree.writeNwk(test_nwk.nwk)
->>> print(nwk)
-(XP_004050792.2:0.040380067,XP_005216113.1:0.028035396,(XP_018963554.1:0.016721581,XP_016357833.1:0.024301326)N1:0.347992941)N0:0;
-```
 
 ### IdxTree
 
     IdxTree( nBranches: int, branchpoints: dict[str, BranchPoint], parents: list[int], children: list[list[Union[int, None]]], indices: dict[str, int], distances: list[float])
 
-IdxTree is condensed phylogenetic tree representation within a POGTree object. Each branchpoint is assigned an index and a BranchPoint object, allowing easy access of information via the sequence name of an extant or an ancestor. 
+IdxTree is condensed phylogenetic tree representation within a 
+POGTree object. Each branchpoint is assigned an index and a BranchPoint
+object, allowing easy access of information via the sequence name of
+an extant or an ancestor.
+
+Parameters:
+
+nBranchs(int): number of branch points in the tree
+
+> * branchpoints(dict[str, BranchPoint]): Contains BranchPoint objects
+> * parents(list[int]): maps the index of the child to the index
+    of the parent
+> * children(list[list[Union[int, None]]]): maps the index of the parent to an array
+    containing the indexes the child/children
+> * indices(dict[str, int]): Maps the sequence ID to the index on the tree
+> * distances(list[float]): Maps the branchpoint to the distance to its parent
+
+Example 
+
+```console 
+>>> IdxTree = IdxTree(nBranches=6, branchpoints = branches, children=children, indices=indices, distances=distances)
+ 
+>>> nwk = tree.writeNwk(test_nwk.nwk)
+>>> print(nwk)
+(XP_004050792.2:0.040380067,XP_005216113.1:0.028035396,(XP_018963554.1:0.016721581,XP_016357833.1:0.024301326)N1:0.347992941)N0:0;
+```
+
+
