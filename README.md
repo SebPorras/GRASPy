@@ -1,5 +1,6 @@
 # GRASP_API
 Files related to the development of a python API for GRASP
+Read the docs at - https://sebporras.github.io/GRASP_API/
 
 # Install instructions 
 
@@ -26,3 +27,7 @@ conda activate GRASPy
 ```
 pip install -r ./GRASP_API/requirements.txt
 ```
+
+# Quick tutorial 
+
+- For an example of how to use the API, go into python_structures and view the notebook called example_workflow 
