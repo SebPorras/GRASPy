@@ -103,7 +103,7 @@ def requestViewQueue() -> dict:
 ###### COMMANDS######
 
 
-def requestPOGTree(aln: str, nwk: str, auth: str = "Guest") -> dict:
+def requestExtantPOGTree(aln: str, nwk: str, auth: str = "Guest") -> dict:
     """Queries the server to turn an alignment
     and a nwk file into the POGTree format with POGraphs for extants.
 
@@ -198,11 +198,11 @@ def requestJointReconstruction(aln: str, nwk: str,
     return response
 
 
-def requestDataTrain(nwk: str,
-                     states: list[str],
-                     data: str,
-                     auth: str = "Guest"
-                     ):
+def requestTrainFromData(nwk: str,
+                         states: list[str],
+                         data: str,
+                         auth: str = "Guest"
+                         ):
     """Learns the distribution of an arbitrary number of discrete 
     states. The output from the job will be a new/refined distribution. 
 

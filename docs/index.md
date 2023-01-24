@@ -153,41 +153,6 @@ use BEP for indel model and JTT for the substitution model.
 
 Parameters:
 
-> - nwk(str) = path to file name of nwk
-> - states(list) = a list of names for states
-> - data(str) = path to csv with data
-> - auth(str) = Authentication token, defaults to Guest
-
-Returns:
-
-> str - Job number
-
-Example
-
-```console
->>> requestJointReconstruction(aln="test_aln.aln", nwk="test_nwk.nwk")
-
-Socket created...
-
-Connecting to server...
-
-Socket connected to 10.139.1.21 on IP 4072
-
-Closing socket...
-
-{"Message":"Queued","Job":19}
-
-```
-
-### requestDataTrain
-
-    requestDataTrain(nwk: str, states: list[str], data: str, auth: str "Guest"):
-
-Learns the distribution of an arbitrary number of discrete
-states. The output from the job will be a new/refined distribution.
-
-Parameters:
-
 > - aln(str) = file name of aln file
 > - nwk(str) = file name of nwk file
 > - auth(str) = Authentication token, defaults to Guest
@@ -215,6 +180,75 @@ Closing socket...
 
 ```
 
+### requestExtantPOGTree
+
+    g_requests.requestExtantPOGTree(aln: str, nwk: str, auth: str = "Guest")
+
+Queries the server to turn an alignment
+and a nwk file into the POGTree format with POGraphs for extants.
+This output JSON can be converted into a POGTree object
+via POGTreeFromJSON()
+
+Parameters:
+
+> - aln(str) = file name of aln file
+> - nwk(str) = file name of nwk file
+
+Returns:
+
+> Dict: POGTree and POGraphs in JSON format
+
+Example
+
+```console
+>>> requestJointReconstruction(aln="test_aln.aln", nwk="test_nwk.nwk")
+
+Socket created...
+
+Connecting to server...
+
+Socket connected to 10.139.1.21 on IP 4072
+
+Closing socket...
+
+{"Job":<job-number>, "Result":{<result-JSON>}}
+
+```
+
+### requestTrainFromData
+
+    requestTrainFromData(nwk: str, states: list[str], data: str, auth: str "Guest"):
+
+Learns the distribution of an arbitrary number of discrete
+states. The output from the job will be a new/refined distribution.
+
+Parameters:
+
+> - nwk(str) = path to file name of nwk
+> - states(list) = a list of names for states
+> - data(str) = path to csv with data
+> - auth(str) = Authentication token, defaults to Guest
+
+Returns:
+
+> str - Job number
+
+Example
+
+```console
+>>> requestTrainFromData(nwk="./3_2_1_1_filt.nwk", states=["A", "B"], data="train_data.csv")
+
+Socket created...
+
+Connecting to server...
+
+Socket connected to 10.139.1.21 on IP 4072
+
+Closing socket...
+
+{"Job":<job-number>, "Result":{<result-JSON>}}
+```
+
 ## Data Structures
 
 - GRASPy has a number of data structures that can be used to interact with output from the bnkit server responses.
@@ -230,13 +264,10 @@ POGraphs for extants.
 
 Parameters:
 
-> - nwk (str or dict): Users can input a nwk file path
-
-    or can provide the output from g_requests.requestPOGTree().
-
+> - nwk (str or dict): Users can input a nwk file path or can provide
+>   the output from g_requests.requestPOGTree().
 > - POG_graphs(dict): The POGraphs for ancestors generated from
-
-    output from g_requests.requestJointReconstruction().
+>   output from g_requests.requestJointReconstruction().
 
 Returns:
 
