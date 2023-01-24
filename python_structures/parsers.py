@@ -8,12 +8,11 @@
 
 from typing import Tuple, Union
 import pog_tree
-import idx_tree
 import pog_graph
 import numpy as np
 
 
-def _find_p(s: str) -> Tuple[int, int]:
+def find_p(s: str) -> Tuple[int, int]:
     """Locates the first index positions for the top most
     embedding within a nwk string. This allows substrings 
     to be located
@@ -34,7 +33,7 @@ def _find_p(s: str) -> Tuple[int, int]:
     return start, true_end
 
 
-def _find_comma(s: str, level: int = 0) -> list[int]:
+def find_comma(s: str, level: int = 0) -> list[int]:
     """
     Finds all commas within a particular embedding level for 
     a nwk string. This essentially locates where children are 
@@ -66,9 +65,9 @@ def _find_comma(s: str, level: int = 0) -> list[int]:
     return coms
 
 
-def _make_label(child: str, isLabeled: bool, idx: int, count: int) -> str:
+def make_label(child: str, isLabeled: bool, idx: int, count: int) -> str:
     """
-    Used within the _nwk_split method to create labels for nodes.
+    Used within the nwk_split method to create labels for nodes.
 
     Parameters:
         child(str): current child 
@@ -90,7 +89,7 @@ def _make_label(child: str, isLabeled: bool, idx: int, count: int) -> str:
     return label
 
 
-def _nwk_split(n: str, data=None, isLabeled=False) -> dict:
+def nwk_split(n: str, data=None, isLabeled=False) -> dict:
     """Performs a depth first search (DFS) of a nwk string and records
     the order of sequences and the parent of each node. Note the 
     recursive nature of the function. 
@@ -112,11 +111,11 @@ def _nwk_split(n: str, data=None, isLabeled=False) -> dict:
         data["Parents"] = {}
 
     # locates the first embedding in a nwk string
-    start, end = _find_p(n)
+    start, end = find_p(n)
 
     # Assigns an internal node a number starting with 0 at the root
 
-    parent = _make_label(n, isLabeled, end, data["count"])
+    parent = make_label(n, isLabeled, end, data["count"])
 
     data["order"].append(parent)
 
@@ -124,7 +123,7 @@ def _nwk_split(n: str, data=None, isLabeled=False) -> dict:
     children = n[start+1: end]
 
     # finds all children for current embedding
-    coms = _find_comma(children)
+    coms = find_comma(children)
 
     sub_strings = []
 
@@ -142,7 +141,7 @@ def _nwk_split(n: str, data=None, isLabeled=False) -> dict:
     for child in sub_strings:
 
         # look for the next embedding within "(...)"
-        p_start, p_end = _find_p(child)
+        p_start, p_end = find_p(child)
 
         # this is the base case for an extant sequence
         if p_start == -1 and p_end == -1:
@@ -157,12 +156,12 @@ def _nwk_split(n: str, data=None, isLabeled=False) -> dict:
             # implies another ancestor has been found
             data["count"] += 1
 
-            label = _make_label(child, isLabeled, p_end, data["count"])
+            label = make_label(child, isLabeled, p_end, data["count"])
 
             data["Parents"][label] = parent
 
             # repeat on the next ancestor
-            _nwk_split(child, data, isLabeled)
+            nwk_split(child, data, isLabeled)
 
     return data
 
@@ -190,21 +189,21 @@ def nwkToJSON(nwk: str) -> dict:
         # remove ;  and add root distance
         job = nwk[:-1] + ":0"
 
-        raw_tree = _nwk_split(job)
+        raw_tree = nwk_split(job)
 
     # root has dist but no internal nodes e.g. ...):0.123;
     elif nwk[end:].split(":")[0] == "":
 
         job = nwk[:end] + nwk[end:-1]
 
-        raw_tree = _nwk_split(job)
+        raw_tree = nwk_split(job)
 
     # for nwk output from a GRASP job e.g ...)N0;
     elif nwk[end:].split(":")[0] != "":
 
         job = nwk[:-1]
 
-        raw_tree = _nwk_split(job, isLabeled=True)
+        raw_tree = nwk_split(job, isLabeled=True)
 
     else:
         raise RuntimeError("nwk in unsupported or incorrect format")
@@ -305,20 +304,19 @@ def alnToJSON(file_name: str, data_type: str) -> dict:
     return alignments
 
 
-def IdxTreeFromJSON(serial: dict) -> idx_tree.IdxTree:
-    """Instantiates a IdxTree object from a Json file
+def TreeFromJSON(serial: dict) -> dict:
+    """Creates a IdxTree in a dict from a JSON file
 
     Parameters:
-        json_file (os.PathLike): path to json file
+        serial: JSON form of an IdxTree
 
     Returns:
-        IdxTree
+        dict
     """
-
-    # Currently, assuming that output will contain all these fields
 
     if ("Distances" or "Branchpoints" or "Labels" or "Parents") \
             not in serial.keys():
+
         raise RuntimeError("JSON in incorrect format")
 
     jdists = serial["Distances"]
@@ -363,7 +361,7 @@ def IdxTreeFromJSON(serial: dict) -> idx_tree.IdxTree:
 
         children.append(curr_children)
 
-    # branch points mirror information in the tree but in human readble form
+    # branch points represent sequences on the tree
     bpoints = {}
 
     for BIdx in range(nBranches):
@@ -379,10 +377,12 @@ def IdxTreeFromJSON(serial: dict) -> idx_tree.IdxTree:
 
         if None in children[BIdx]:
             c_lab.append(None)
+
         else:
             for i in children[BIdx]:
 
                 lab = jlabels[i]
+
                 if lab.isdigit():
 
                     lab = "N" + lab
@@ -398,15 +398,22 @@ def IdxTreeFromJSON(serial: dict) -> idx_tree.IdxTree:
         else:
             p = "N" + jlabels[p_idx]
 
-        bp = idx_tree.BranchPoint(id=name,
+        bp = pog_tree.BranchPoint(id=name,
                                   parent=p,
                                   dist=distances[BIdx],
                                   children=c_lab)
 
         bpoints[name] = bp
 
-    return idx_tree.IdxTree(nBranches=nBranches, branchpoints=bpoints, parents=parents,
-                            children=children, indices=indices, distances=distances)
+    tree = {}
+    tree['nBranches'] = nBranches
+    tree['branchpoints'] = bpoints
+    tree['parents'] = parents
+    tree['children'] = children
+    tree['indices'] = indices
+    tree['distances'] = distances
+
+    return tree
 
 
 def POGraphFromJSON(jpog: dict, isAncestor: bool = False) -> pog_graph.POGraph:
@@ -449,7 +456,7 @@ def POGraphFromJSON(jpog: dict, isAncestor: bool = False) -> pog_graph.POGraph:
                 es.append(edge)
 
         node = pog_graph.SymNode(name=indices[i],
-                                 value=node_vals[i]["Value"], edges=es)
+                                 symbol=node_vals[i]["Value"], edges=es)
 
         nodes.append(node)
 
@@ -546,7 +553,7 @@ def POGTreeFromJSON(nwk: Union[str, dict], POG_graphs: dict) -> pog_tree.POGTree
     # this will hold all POGraphs
     graphs = dict()
 
-    # case for using a nwk file
+    # case for using a nwk file for IdxTree
     if isinstance(nwk, str):
 
         with open(nwk, 'r') as f:
@@ -556,12 +563,12 @@ def POGTreeFromJSON(nwk: Union[str, dict], POG_graphs: dict) -> pog_tree.POGTree
 
             j_tree = nwkToJSON(tree_parts)
 
-        tree = IdxTreeFromJSON(j_tree)
+        tree = TreeFromJSON(j_tree)
 
-    # case when using output from bnkit server
+    # case when using output from server for IdxTree
     elif isinstance(nwk, dict):
 
-        tree = IdxTreeFromJSON(nwk["Result"]["Tree"])
+        tree = TreeFromJSON(nwk["Result"]["Tree"])
 
         for e in nwk["Result"]["Extants"]:
 
@@ -581,4 +588,10 @@ def POGTreeFromJSON(nwk: Union[str, dict], POG_graphs: dict) -> pog_tree.POGTree
 
         graphs[g.name] = g
 
-    return pog_tree.POGTree(idxTree=tree, POGraphs=graphs)
+    return pog_tree.POGTree(nBranches=tree['nBranches'],
+                            branchpoints=tree['branchpoints'],
+                            parents=tree['parents'],
+                            children=tree['children'],
+                            indices=tree['indices'],
+                            distances=tree['distances'],
+                            POGraphs=graphs)

@@ -56,23 +56,23 @@ class SymNode(object):
     and all of the edges at this position.
     """
 
-    def __init__(self, name: int, value: str, edges: list) -> None:
+    def __init__(self, name: int, symbol: str, edges: list) -> None:
         """Constructs instance of the object.
 
         Parameters:
             name(int): index position in sequence
 
-            value(str): Most likely amino acid based on joint reconstruction
+            symbol(str): Most likely amino acid based on joint reconstruction
 
             edges(list): Contains all outgoing edges at this position
         """
 
         self.name = name
-        self.value = value
+        self.symbol = symbol
         self.edges = edges
 
     def __str__(self) -> str:
-        return (f"Name: {self.name}\nValue: {self.value}\n# of edges: {len(self.edges)}")
+        return (f"Name: {self.name}\nsymbol: {self.symbol}\n# of edges: {len(self.edges)}")
 
 
 class POGraph(object):

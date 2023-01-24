@@ -10,6 +10,7 @@
 import json
 import client
 from parsers import *
+import pandas as pd
 
 
 ###### REQUESTS######
@@ -145,11 +146,11 @@ def requestPOGTree(aln: str, nwk: str, auth: str = "Guest") -> dict:
     return response
 
 
-def JointReconstruction(aln: str, nwk: str,
-                        auth: str = "Guest",
-                        indels: str = "BEP",
-                        model: str = "JTT",
-                        alphabet: str = "Protein") -> str:
+def requestJointReconstruction(aln: str, nwk: str,
+                               auth: str = "Guest",
+                               indels: str = "BEP",
+                               model: str = "JTT",
+                               alphabet: str = "Protein") -> str:
     """Queries the bnkit server for a joint reconstruction.
     Will default to standard bnkit reconstruction parameters which
     use BEP for indels and JTT for the substitution model.
@@ -188,6 +189,69 @@ def JointReconstruction(aln: str, nwk: str,
     params["Indels"] = indels
     params["Model"] = model
 
+    request["Params"] = params
+
+    j_request = json.dumps(request) + '\n'
+
+    response = client.sendRequest(j_request)
+
+    return response
+
+
+def requestDataTrain(nwk: str,
+                     states: list[str],
+                     data: str,
+                     auth: str = "Guest"
+                     ):
+    """Learns the distribution of an arbitrary number of discrete 
+    states. The output from the job will be a new/refined distribution. 
+
+    Parameters:
+        nwk(str) = path to file name of nwk 
+        states(list) = a list of names for states
+        data(str) = path to csv with data 
+        auth(str) = Authentication token, defaults to Guest
+
+    Returns:
+        str: {"Message":"Queued","Job":<job-number>}
+    """
+
+    request = dict()
+
+    request["Command"] = "Train"
+    request["Auth"] = auth
+
+    params = dict()
+
+    params["States"] = states
+
+    # format tree
+    with open(nwk, 'r') as f:
+        tree = ""
+        for line in f:
+            tree += line.strip()
+
+    params["Tree"] = nwkToJSON(tree)
+
+    #read in dataset
+    csv_data = pd.read_csv(data)
+
+    j_data = dict()
+    j_data["Headers"] = csv_data["Headers"].tolist()
+
+    fixed = []
+
+    for val in csv_data["Data"]:
+
+        if pd.isna(val):
+            fixed.append([None])
+        else:
+            fixed.append([val])
+
+    j_data["Data"] = fixed
+    params["Dataset"] = j_data
+
+    # load all parameters
     request["Params"] = params
 
     j_request = json.dumps(request) + '\n'
