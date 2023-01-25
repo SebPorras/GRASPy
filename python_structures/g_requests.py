@@ -16,7 +16,7 @@ import pandas as pd
 ###### REQUESTS######
 
 
-def requestJobOutput(job_id: int) -> dict:
+def JobOutput(job_id: int) -> dict:
     """Requests the output of a submitted job. Request will be
     denied if the job is not complete.
 
@@ -39,7 +39,7 @@ def requestJobOutput(job_id: int) -> dict:
     return json.loads(response)
 
 
-def requestPlaceInQueue(job_id: int) -> str:
+def PlaceInQueue(job_id: int) -> str:
     """Requests the status of a submitted job
 
     Parameters:
@@ -61,7 +61,7 @@ def requestPlaceInQueue(job_id: int) -> str:
     return response
 
 
-def requestCancelJob(job_id: int) -> str:
+def CancelJob(job_id: int) -> str:
     """Requests the status of a submitted job
 
     Parameters:
@@ -81,7 +81,7 @@ def requestCancelJob(job_id: int) -> str:
     return client.sendRequest(j_request)
 
 
-def requestViewQueue() -> dict:
+def ViewQueue() -> dict:
     """Lists all the jobs currently being 
     performed by the server 
 
@@ -103,7 +103,7 @@ def requestViewQueue() -> dict:
 ###### COMMANDS######
 
 
-def requestExtantPOGTree(aln: str, nwk: str, auth: str = "Guest") -> dict:
+def ExtantPOGTree(aln: str, nwk: str, auth: str = "Guest") -> dict:
     """Queries the server to turn an alignment
     and a nwk file into the POGTree format with POGraphs for extants.
 
@@ -146,11 +146,11 @@ def requestExtantPOGTree(aln: str, nwk: str, auth: str = "Guest") -> dict:
     return response
 
 
-def requestJointReconstruction(aln: str, nwk: str,
-                               auth: str = "Guest",
-                               indels: str = "BEP",
-                               model: str = "JTT",
-                               alphabet: str = "Protein") -> str:
+def JointReconstruction(aln: str, nwk: str,
+                        auth: str = "Guest",
+                        indels: str = "BEP",
+                        model: str = "JTT",
+                        alphabet: str = "Protein") -> str:
     """Queries the bnkit server for a joint reconstruction.
     Will default to standard bnkit reconstruction parameters which
     use BEP for indels and JTT for the substitution model.
@@ -198,11 +198,11 @@ def requestJointReconstruction(aln: str, nwk: str,
     return response
 
 
-def requestTrainFromData(nwk: str,
-                         states: list[str],
-                         data: str,
-                         auth: str = "Guest"
-                         ):
+def TrainFromData(nwk: str,
+                  states: list[str],
+                  data: str,
+                  auth: str = "Guest"
+                  ) -> str:
     """Learns the distribution of an arbitrary number of discrete 
     states. The output from the job will be a new/refined distribution. 
 
@@ -259,3 +259,72 @@ def requestTrainFromData(nwk: str,
     response = client.sendRequest(j_request)
 
     return response
+
+
+def InferFromData(nwk: str,
+                  states: list[str],
+                  data: str,
+                  distrib: dict,
+                  auth: str = "Guest"
+                  ) -> str:
+    """Refines a current distribution based on a previous output 
+    from requestTrainFromData(). 
+
+    Parameters:
+        nwk(str) = path to file name of nwk 
+        states(list) = a list of names for states
+        data(str) = path to csv with data
+        distrib(dict) = a previously trained distribution from data 
+        auth(str) = Authentication token, defaults to Guest
+
+    Returns:
+        str: {"Message":"Queued","Job":<job-number>}
+    """
+
+    request = dict()
+
+    request["Command"] = "Infer"
+    request["Auth"] = auth
+
+    params = dict()
+
+    params["States"] = states
+
+    # format tree
+    with open(nwk, 'r') as f:
+        tree = ""
+        for line in f:
+            tree += line.strip()
+
+    params["Tree"] = nwkToJSON(tree)
+
+    #read in dataset
+    csv_data = pd.read_csv(data)
+
+    j_data = dict()
+    j_data["Headers"] = csv_data["Headers"].tolist()
+
+    fixed = []
+
+    for val in csv_data["Data"]:
+
+        if pd.isna(val):
+            fixed.append([None])
+        else:
+            fixed.append([val])
+
+    j_data["Data"] = fixed
+    params["Dataset"] = j_data
+
+    # load previous distribution
+    params["Distrib"] = distrib
+
+    # load all parameters
+    request["Params"] = params
+
+    j_request = json.dumps(request) + '\n'
+
+    print(j_request)
+    # response = client.sendRequest(j_request)
+
+    # return response

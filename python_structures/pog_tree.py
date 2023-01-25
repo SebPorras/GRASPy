@@ -16,30 +16,31 @@ class BranchPoint(object):
     """Represents a branchpoint on a phylogenetic tree. Can contain
     information about the parents or children of that point and how
     long that branch point is.
-
-    Future use -> can associate annotations with this branch point
-    but must be in JSON format
     """
 
     def __init__(self, id: str, parent: Union[str, None], dist: float,
-                 children: list[str]) -> None:
+                 children: list[str], seq: str = "") -> None:
         """ Constructs instance of a branchpoint.
 
         Parameters:
             id(str): Sequence ID
 
-            parent(int): Index of parent branchpoint
+            parent(str or None]): ID of parent 
 
             dist(float): Distance to parent
 
-            children(np.array): all children of branchpoint
+            children(list): IDs children of current BranchPoint
+
+            seq(str): the sequence based on a joint reconstruction 
+            if the BranchPoint is an ancestor otherwise it is just 
+            the sequence of an extant.
         """
 
         self.id = id
         self.parent = parent
         self.dist = dist
         self.children = children
-        self.seq = ""
+        self.seq = seq
 
     def __str__(self) -> str:
 
