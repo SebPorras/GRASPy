@@ -217,7 +217,7 @@ Closing socket...
 
 ### requestTrainFromData
 
-    requestTrainFromData(nwk: str, states: list[str], data: str, auth: str "Guest"):
+    requestTrainFromData(nwk: str, states: list[str], data: str, auth: str = "Guest"):
 
 Learns the distribution of an arbitrary number of discrete
 states. The output from the job will be a new/refined distribution.
@@ -308,8 +308,6 @@ Parameters:
 > - distances(list[float]): Maps the branchpoint to the distance to
 >   its parent
 
-POGraph(POGraph): Instance of a POGraph object
-
 #### writeToNwk
 
     pog_tree.writeToNwk(file_name: str, root: str = "N0")
@@ -333,3 +331,51 @@ Example
 >>> print(nwk)
 (XP_004050792.2:0.040380067,XP_005216113.1:0.028035396,(XP_018963554.1:0.016721581,XP_016357833.1:0.024301326)N1:0.347992941)N0:0;
 ```
+
+### BranchPoint
+
+    BranchPoint(id: str, parent: Union[str, None], dist: float,
+                 children: list[str])
+
+Represents a branchpoint on a phylogenetic tree. Can contain
+information about the parents or children of that point and how
+long that branch point is.
+
+Parameters:
+
+> - id(str): Sequence ID
+> - parent(str or None): ID of parent
+> - dist(float): Distance to parent
+> - children(list): IDs children of current BranchPoint
+> - seq(str): the sequence based on a joint reconstruction
+>   if the BranchPoint is an ancestor otherwise it is just
+>   the sequence of an extant.
+
+### SymNode
+
+    SymNode(name: int, symbol: str, edges: list)
+
+Only implemented for output from joint reconstruction.
+Stores the most likely character at a given sequence position
+and all of the edges at this position.
+
+Parameters:
+
+> - name(int): index position in sequence
+> - symbol(str): Most likely amino acid based on joint reconstruction
+> - edges(list): Contains all outgoing edges at this position
+
+### Edge
+
+    Edge(start: int, end: int, edgeType: Optional[str] = None, recip: Optional[bool] = None, backward: Optional[bool] = None, forward: Optional[bool] = None, weight: Optional[float] = None)
+
+Creates instance of an edge between two positions in a sequence.
+Currently only implemented for bidirectional edges.
+
+> - start(int): position of beginning of edge
+> - end(int): position of end of edge
+> - edgeType(str): Currently only supports bidirectional edge
+> - recip(bool): ASK ABOUT THIS
+> - backward(bool): Direction of edge
+> - forward(bool): Direction of edge
+> - weight(float): Support of the edge
