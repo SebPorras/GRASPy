@@ -4,7 +4,7 @@ Read the docs at - https://sebporras.github.io/GRASP_API/
 
 # Install instructions 
 
-1. Clone this repository to your desktop
+1. Clone this repository to your computer
 
 ```
 git clone https://github.com/SebPorras/GRASP_API.git
