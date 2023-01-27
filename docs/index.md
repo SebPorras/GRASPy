@@ -7,8 +7,7 @@ Read the paper [here](https://doi.org/10.1371/journal.pcbi.1010633)
 
 ## Requests
 
-- GRASPy interacts with our servers via sockets. The following commands can be
-  used to submit and retrieve your jobs.
+- Retrieves any information about a particular job or the output from a job.
 
 ### PlaceInQueue
 
@@ -156,7 +155,7 @@ Returns:
 
 Example
 
-````console
+```console
 
 >>>g_requests.JobStatus(19)
 
@@ -169,7 +168,7 @@ Socket connected to 10.139.1.21 on IP 4072
 Closing socket...
 
 {'Status': 'COMPLETED', 'Job': 39}
-
+```
 
 ## Commands
 
@@ -209,9 +208,9 @@ Closing socket...
 
 {"Message":"Queued","Job":19}
 
-````
+```
 
-### requestExtantPOGTree
+### ExtantPOGTree
 
     g_requests.ExtantPOGTree(aln: str, nwk: str, auth: str = "Guest")
 
