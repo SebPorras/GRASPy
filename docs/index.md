@@ -10,9 +10,9 @@ Read the paper [here](https://doi.org/10.1371/journal.pcbi.1010633)
 - GRASPy interacts with our servers via sockets. The following commands can be
   used to submit and retrieve your jobs.
 
-### requestPlaceInQueue
+### PlaceInQueue
 
-    g_requests.requestPlaceInQueue(job_id:str)
+    g_requests.PlaceInQueue(job_id:str)
 
 Requests the place in queue of a submitted job.
 
@@ -41,9 +41,9 @@ Closing socket...
 '{"Job":19,"Place":0}
 ```
 
-### requestJobOutput
+### JobOutput
 
-    g_requests.requestJobResult(job_id: str)
+    g_requests.JobResult(job_id: str)
 
 Requests the output of a submitted job. Request will be
 denied if the job is not complete.
@@ -60,7 +60,7 @@ Example
 
 ```console
 
->>>g_requests.requestJobResult(19)
+>>>g_requests.JobResult(19)
 
 Socket created...
 
@@ -72,9 +72,9 @@ Closing socket...
 
 ```
 
-### requestViewQueue
+### ViewQueue
 
-    g_requests.requestViewQueue()
+    g_requests.ViewQueue()
 
 Lists all the jobs currently being
 performed by the server
@@ -91,7 +91,7 @@ Example
 
 ```console
 
->>>g_requests.requestJobResult(19)
+>>>g_requests.JobResult(19)
 
 Socket created...
 
@@ -108,9 +108,9 @@ Closing socket...
 
 ```
 
-### requestCancelJob
+### CancelJob
 
-    g_requests.requestCancelJob(job_id: str)
+    g_requests.CancelJob(job_id: str)
 
 Requests the status of a submitted job.
 
@@ -126,7 +126,7 @@ Example
 
 ```console
 
->>>g_requests.requestCancelJob(19)
+>>>g_requests.CancelJob(19)
 
 Socket created...
 
@@ -140,11 +140,42 @@ Closing socket...
 
 ```
 
+### JobStatus
+
+    g_requests.JobStatus(job_id: str)
+
+Requests the status of job as either completed or queued.
+
+Parameters:
+
+> - job_id(str): The ID of the job
+
+Returns:
+
+> str: {'Status': 'COMPLETED', 'Job': job_id}
+
+Example
+
+````console
+
+>>>g_requests.JobStatus(19)
+
+Socket created...
+
+Connecting to server...
+
+Socket connected to 10.139.1.21 on IP 4072
+
+Closing socket...
+
+{'Status': 'COMPLETED', 'Job': 39}
+
+
 ## Commands
 
-### requestJointReconstruction
+### JointReconstruction
 
-    g_requests.requestJointReconstruction(aln: str, nwk: str, auth: str = "Guest,
+    g_requests.JointReconstruction(aln: str, nwk: str, auth: str = "Guest,
     indels: str = "BEP", model: str = "JTT") -> str:
 
 Queries the bnkit server for a joint reconstruction.
@@ -166,7 +197,7 @@ Returns:
 Example
 
 ```console
->>> requestJointReconstruction(aln="test_aln.aln", nwk="test_nwk.nwk")
+>>> JointReconstruction(aln="test_aln.aln", nwk="test_nwk.nwk")
 
 Socket created...
 
@@ -178,11 +209,11 @@ Closing socket...
 
 {"Message":"Queued","Job":19}
 
-```
+````
 
 ### requestExtantPOGTree
 
-    g_requests.requestExtantPOGTree(aln: str, nwk: str, auth: str = "Guest")
+    g_requests.ExtantPOGTree(aln: str, nwk: str, auth: str = "Guest")
 
 Queries the server to turn an alignment
 and a nwk file into the POGTree format with POGraphs for extants.
@@ -201,7 +232,7 @@ Returns:
 Example
 
 ```console
->>> requestJointReconstruction(aln="test_aln.aln", nwk="test_nwk.nwk")
+>>> ExtantPOGTree(aln="test_aln.aln", nwk="test_nwk.nwk")
 
 Socket created...
 
@@ -215,9 +246,9 @@ Closing socket...
 
 ```
 
-### requestTrainFromData
+### TrainFromData
 
-    requestTrainFromData(nwk: str, states: list[str], data: str, auth: str = "Guest"):
+    TrainFromData(nwk: str, states: list[str], data: str, auth: str = "Guest"):
 
 Learns the distribution of an arbitrary number of discrete
 states. The output from the job will be a new/refined distribution.
@@ -236,7 +267,7 @@ Returns:
 Example
 
 ```console
->>> requestTrainFromData(nwk="./3_2_1_1_filt.nwk", states=["A", "B"], data="train_data.csv")
+>>> TrainFromData(nwk="./3_2_1_1_filt.nwk", states=["A", "B"], data="train_data.csv")
 
 Socket created...
 

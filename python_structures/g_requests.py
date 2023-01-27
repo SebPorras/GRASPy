@@ -100,6 +100,26 @@ def ViewQueue() -> dict:
 
     return json.loads(response)
 
+
+def JobStatus(job_id: int) -> str:
+    """Retrives job status 
+
+
+    Returns:
+        str: status of job as completed or queued
+    """
+
+    request = dict()
+
+    request["Command"] = "Status"
+    request["Job"] = job_id
+
+    j_request = json.dumps(request) + '\n'
+
+    response = client.sendRequest(j_request)
+
+    return json.loads(response)
+
 ###### COMMANDS######
 
 
@@ -266,7 +286,7 @@ def InferFromData(nwk: str,
                   data: str,
                   distrib: dict,
                   auth: str = "Guest"
-                  ) -> str:
+                  ):
     """Refines a current distribution based on a previous output 
     from requestTrainFromData(). 
 
@@ -324,7 +344,6 @@ def InferFromData(nwk: str,
 
     j_request = json.dumps(request) + '\n'
 
-    print(j_request)
-    # response = client.sendRequest(j_request)
+    response = client.sendRequest(j_request)
 
-    # return response
+    return response

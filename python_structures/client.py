@@ -10,7 +10,7 @@ import time
 import sys
 
 
-def recieve_message(socket, timeout=2) -> str:
+def receive_message(socket, timeout=2) -> str:
     """Recieves chunks of data from the server 
     and decodes this from bytes back into a 
     string. 
@@ -90,7 +90,7 @@ def sendRequest(message: str) -> str:
         print("Send failed\n")
         sys.exit()
 
-    response = recieve_message(s)
+    response = receive_message(s)
 
     print("Closing socket...\n")
 
