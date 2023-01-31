@@ -8,8 +8,8 @@
 ###############################################################################
 
 import json
-import client
-from parsers import *
+from . import client
+from . import parsers
 import pandas as pd
 from typing import Optional
 
@@ -55,7 +55,7 @@ def JobOutput(job_id: int) -> dict:
     return response
 
 
-def PlaceInQueue(job_id: int) -> dict:
+def PlaceInQueue(job_id: int) -> dict[str, int]:
     """Requests the status of a submitted job
 
     Parameters:
@@ -73,7 +73,7 @@ def PlaceInQueue(job_id: int) -> dict:
     return send_and_recieve(request)
 
 
-def CancelJob(job_id: int) -> dict:
+def CancelJob(job_id: int) -> dict[str, int]:
     """Requests the status of a submitted job
 
     Parameters:
@@ -153,9 +153,9 @@ def ExtantPOGTree(aln: str, nwk: str, auth: str = "Guest") -> dict:
         for line in f:
             tree += line.strip()
 
-    params["Tree"] = nwkToJSON(tree)
+    params["Tree"] = parsers.nwkToJSON(tree)
 
-    params["Alignment"] = alnToJSON(aln, "Protein")
+    params["Alignment"] = parsers.alnToJSON(aln, "Protein")
 
     request["Params"] = params
 
@@ -199,8 +199,8 @@ def JointReconstruction(aln: str, nwk: str,
         for line in f:
             tree += line.strip()
 
-    params["Tree"] = nwkToJSON(tree)
-    params["Alignment"] = alnToJSON(aln, alphabet)
+    params["Tree"] = parsers.nwkToJSON(tree)
+    params["Alignment"] = parsers.alnToJSON(aln, alphabet)
 
     params["Inference"] = "Joint"
     params["Indels"] = indels
@@ -244,7 +244,7 @@ def LearnLatentDistributions(nwk: str,
         for line in f:
             tree += line.strip()
 
-    params["Tree"] = nwkToJSON(tree)
+    params["Tree"] = parsers.nwkToJSON(tree)
 
     #read in dataset
     csv_data = pd.read_csv(data)
@@ -305,7 +305,7 @@ def InferFromData(nwk: str,
         for line in f:
             tree += line.strip()
 
-    params["Tree"] = nwkToJSON(tree)
+    params["Tree"] = parsers.nwkToJSON(tree)
 
     #read in dataset
     csv_data = pd.read_csv(data)

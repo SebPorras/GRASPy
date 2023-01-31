@@ -7,10 +7,10 @@
 ###############################################################################
 
 from typing import Tuple, Union, Optional
-import pog_tree
-import pog_graph
+from . import pog_tree
+from . import pog_graph
 import numpy as np
-from sequence import *
+from . import sequence
 
 
 def find_p(s: str) -> Tuple[int, int]:
@@ -252,7 +252,7 @@ def alnToJSON(file_name: str, data_type: Optional[str] = None) -> dict:
 
     """
 
-    sequences = readFastaFile(file_name)
+    sequences = sequence.readFastaFile(file_name)
 
     seqs = []
 

@@ -8,7 +8,7 @@
 ###############################################################################
 
 import re
-from sym import *
+from . import seq_sym
 import math
 
 
@@ -60,9 +60,9 @@ class Sequence(object):
                         'Invalid symbol: %c in sequence %s' % (sym, name))
             self.alphabet = alphabet
         else:
-            for alphaName in preferredOrder:
+            for alphaName in seq_sym.preferredOrder:
 
-                alpha = predefAlphabets[alphaName]
+                alpha = seq_sym.predefAlphabets[alphaName]
                 valid = True
 
                 for sym in self.sequence:

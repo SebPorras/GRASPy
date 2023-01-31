@@ -8,7 +8,7 @@
 #################################################################################
 
 
-from pog_graph import *
+from . import pog_graph
 from typing import Union
 
 
@@ -59,7 +59,7 @@ class POGTree(object):
     def __init__(self, nBranches: int, branchpoints: dict[str, BranchPoint],
                  parents: list[int], children: list[list[Union[int, None]]],
                  indices: dict[str, int], distances: list[float],
-                 POGraphs: dict[str, POGraph]) -> None:
+                 POGraphs: dict[str, pog_graph.POGraph]) -> None:
         """Constructs instance of POGTree
 
         Parameters:
