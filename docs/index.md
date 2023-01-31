@@ -245,9 +245,9 @@ Closing socket...
 
 ```
 
-### TrainFromData
+### LearnLatentDistributions
 
-    TrainFromData(nwk: str, states: list[str], data: str, auth: str = "Guest"):
+    LearnLatentDistributions(nwk: str, states: list[str], data: str, auth: str = "Guest"):
 
 Learns the distribution of an arbitrary number of discrete
 states. The output from the job will be a new/refined distribution.
@@ -266,7 +266,7 @@ Returns:
 Example
 
 ```console
->>> TrainFromData(nwk="./3_2_1_1_filt.nwk", states=["A", "B"], data="train_data.csv")
+>>> LearnLatentDistributions(nwk="training.nwk", states=["A", "B"], data="train_data.csv")
 
 Socket created...
 

@@ -211,17 +211,17 @@ def JointReconstruction(aln: str, nwk: str,
     return send_and_recieve(request)
 
 
-def TrainFromData(nwk: str,
-                  states: list[str],
-                  data: str,
-                  auth: str = "Guest"
-                  ) -> dict:
+def LearnLatentDistributions(nwk: str,
+                             states: list[str],
+                             data: str,
+                             auth: str = "Guest"
+                             ) -> dict:
     """Learns the distribution of an arbitrary number of discrete 
     states. The output from the job will be a new/refined distribution. 
 
     Parameters:
         nwk(str) = path to file name of nwk 
-        states(list) = a list of names for states
+        states(list) = a list of names for each latent states
         data(str) = path to csv with data 
         auth(str) = Authentication token, defaults to Guest
 
