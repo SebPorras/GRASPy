@@ -11,9 +11,22 @@ import json
 import client
 from parsers import *
 import pandas as pd
+from typing import Optional
 
 
 ###### REQUESTS######
+
+def send_and_recieve(request: dict) -> dict:
+
+    j_request = json.dumps(request) + '\n'
+
+    j_response = client.sendRequest(j_request)
+
+    response = json.loads(j_response)
+
+    print(response)
+
+    return response
 
 
 def JobOutput(job_id: int) -> dict:
@@ -32,14 +45,17 @@ def JobOutput(job_id: int) -> dict:
     request["Command"] = "Output"
     request["Job"] = job_id
 
+    # won't use function so entire output is not printed
     j_request = json.dumps(request) + '\n'
 
-    response = client.sendRequest(j_request)
+    j_response = client.sendRequest(j_request)
 
-    return json.loads(response)
+    response = json.loads(j_response)
+
+    return response
 
 
-def PlaceInQueue(job_id: int) -> str:
+def PlaceInQueue(job_id: int) -> dict:
     """Requests the status of a submitted job
 
     Parameters:
@@ -54,14 +70,10 @@ def PlaceInQueue(job_id: int) -> str:
     request["Command"] = "Place"
     request["Job"] = job_id
 
-    j_request = json.dumps(request) + '\n'
-
-    response = client.sendRequest(j_request)
-
-    return response
+    return send_and_recieve(request)
 
 
-def CancelJob(job_id: int) -> str:
+def CancelJob(job_id: int) -> dict:
     """Requests the status of a submitted job
 
     Parameters:
@@ -76,9 +88,7 @@ def CancelJob(job_id: int) -> str:
     request["Command"] = "Retrieve"
     request["Job"] = job_id
 
-    j_request = json.dumps(request) + '\n'
-
-    return client.sendRequest(j_request)
+    return send_and_recieve(request)
 
 
 def ViewQueue() -> dict:
@@ -94,14 +104,10 @@ def ViewQueue() -> dict:
 
     request["Command"] = "Status"
 
-    j_request = json.dumps(request) + '\n'
-
-    response = client.sendRequest(j_request)
-
-    return json.loads(response)
+    return send_and_recieve(request)
 
 
-def JobStatus(job_id: int) -> str:
+def JobStatus(job_id: int) -> dict:
     """Retrives job status 
 
 
@@ -114,11 +120,7 @@ def JobStatus(job_id: int) -> str:
     request["Command"] = "Status"
     request["Job"] = job_id
 
-    j_request = json.dumps(request) + '\n'
-
-    response = client.sendRequest(j_request)
-
-    return json.loads(response)
+    return send_and_recieve(request)
 
 ###### COMMANDS######
 
@@ -157,26 +159,19 @@ def ExtantPOGTree(aln: str, nwk: str, auth: str = "Guest") -> dict:
 
     request["Params"] = params
 
-    j_request = json.dumps(request) + '\n'
-
-    j_response = client.sendRequest(j_request)
-
-    response = json.loads(j_response)
-
-    return response
+    return send_and_recieve(request)
 
 
 def JointReconstruction(aln: str, nwk: str,
                         auth: str = "Guest",
                         indels: str = "BEP",
                         model: str = "JTT",
-                        alphabet: str = "Protein") -> str:
+                        alphabet: Optional[str] = None) -> dict:
     """Queries the bnkit server for a joint reconstruction.
     Will default to standard bnkit reconstruction parameters which
     use BEP for indels and JTT for the substitution model.
 
-    Currently ONLY implemented for protein alphabets. Future version
-    will guess unless user specifies alphabet. 
+    Current accepted alphabets: 'DNA', 'RNA', 'Protein'
 
     Parameters:
         aln(str) = path to file name of aln 
@@ -184,7 +179,9 @@ def JointReconstruction(aln: str, nwk: str,
         auth(str) = Authentication token, defaults to Guest
         indels(str) = Indel mode, defaults to BEP
         model(str) = Substitution model, defaults to JTT
-        alphabet(str) = Sequence type. e.g. DNA or Protein 
+        alphabet(str) = Sequence type. e.g. DNA or Protein. 
+                        If user does not specify, it will guess
+                        based on sequence content. 
 
     Returns:
         str: {"Message":"Queued","Job":<job-number>}
@@ -211,18 +208,14 @@ def JointReconstruction(aln: str, nwk: str,
 
     request["Params"] = params
 
-    j_request = json.dumps(request) + '\n'
-
-    response = client.sendRequest(j_request)
-
-    return response
+    return send_and_recieve(request)
 
 
 def TrainFromData(nwk: str,
                   states: list[str],
                   data: str,
                   auth: str = "Guest"
-                  ) -> str:
+                  ) -> dict:
     """Learns the distribution of an arbitrary number of discrete 
     states. The output from the job will be a new/refined distribution. 
 
@@ -274,11 +267,7 @@ def TrainFromData(nwk: str,
     # load all parameters
     request["Params"] = params
 
-    j_request = json.dumps(request) + '\n'
-
-    response = client.sendRequest(j_request)
-
-    return response
+    return send_and_recieve(request)
 
 
 def InferFromData(nwk: str,
@@ -286,7 +275,7 @@ def InferFromData(nwk: str,
                   data: str,
                   distrib: dict,
                   auth: str = "Guest"
-                  ):
+                  ) -> dict:
     """Refines a current distribution based on a previous output 
     from requestTrainFromData(). 
 
@@ -342,8 +331,4 @@ def InferFromData(nwk: str,
     # load all parameters
     request["Params"] = params
 
-    j_request = json.dumps(request) + '\n'
-
-    response = client.sendRequest(j_request)
-
-    return response
+    return send_and_recieve(request)

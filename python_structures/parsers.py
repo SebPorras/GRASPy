@@ -6,10 +6,11 @@
 # and also any string formating functions.
 ###############################################################################
 
-from typing import Tuple, Union
+from typing import Tuple, Union, Optional
 import pog_tree
 import pog_graph
 import numpy as np
+from sequence import *
 
 
 def find_p(s: str) -> Tuple[int, int]:
@@ -236,70 +237,44 @@ def nwkToJSON(nwk: str) -> dict:
     return json_idx
 
 
-def alnToJSON(file_name: str, data_type: str) -> dict:
+def alnToJSON(file_name: str, data_type: Optional[str] = None) -> dict:
     """
     Creates a dictionary where seq ids are the key
     and alignment is the value.
 
     Parameters:
         file_name(str): path to aln file
-        data_type(str): user must specify what alignment letters are.
-        E.g DNA or Protein
+        data_type(str): user must specify what alignment letters are 
+        e.g DNA or Protein otherwise it will guess 
 
     Returns:
         list: alignment seqs in JSON format
 
     """
 
+    sequences = readFastaFile(file_name)
+
     seqs = []
 
-    with open(file_name, "r") as fa:
+    for seq in sequences:
 
-        line = fa.readline()
+        tmp = {}
 
-        while line:
+        tmp["Name"] = seq.name
 
-            if line[0] == ">":
+        # remove any gap characters
+        tmp["Seq"] = [None if s == "-" else s for s in seq.sequence]
 
-                tmp = {}
-
-                # this would save extra info in fasta file
-                # key = "_".join(line.split())
-
-                # currently, just saves seq id and removes '>'
-                key = line.split()[0][1:]
-
-                aln = ""
-
-                line = fa.readline()
-
-                while line[0] != ">":
-
-                    aln += line.strip()
-                    line = fa.readline()
-
-                    if not line:
-                        break
-
-                tmp["Name"] = key
-
-                sequence = []
-
-                for letter in aln:
-                    if letter == "-":
-                        sequence.append(None)
-                    else:
-                        sequence.append(letter)
-
-                tmp["Seq"] = sequence
-
-                seqs.append(tmp)
-            else:
-                line = fa.readline()
+        seqs.append(tmp)
 
     alignments = dict()
     alignments["Sequences"] = seqs
-    alignments["Datatype"] = {"Predef": data_type}
+
+    # will guess based on sequence what the alphabet is
+    if data_type is None:
+        alignments["Datatype"] = {"Predef": sequences[0].alphabet}
+    else:
+        alignments["Datatype"] = {"Predef": data_type}
 
     return alignments
 
