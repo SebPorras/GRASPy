@@ -26,7 +26,7 @@ conda activate GRASPy
 4. Install the required Python packages 
 
 ```
-pip install -r ./GRASP_API/requirements.txt
+pip install -r ./GRASPy/requirements.txt
 ```
 
 # Quick tutorial 
