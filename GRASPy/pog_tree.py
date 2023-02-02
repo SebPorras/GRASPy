@@ -32,9 +32,9 @@ class BranchPoint(object):
 
             children(list): IDs children of current BranchPoint
 
-            seq(str): the sequence based on a joint reconstruction
+            seq(Sequence): the sequence based on a joint reconstruction
             if the BranchPoint is an ancestor otherwise it is just
-            the sequence of an extant.
+            the sequence of an extant. Contains a Sequence object. 
         """
 
         self.id = id

@@ -428,7 +428,7 @@ Example
 ### BranchPoint
 
     BranchPoint(id: str, parent: Union[str, None], dist: float,
-                 children: list[str])
+                 children: list[str], seq: Optional[Sequence] = None)
 
 Represents a branchpoint on a phylogenetic tree. Can contain
 information about the parents or children of that point and how
@@ -440,9 +440,9 @@ Parameters:
 > - parent(str or None): ID of parent
 > - dist(float): Distance to parent
 > - children(list): IDs children of current BranchPoint
-> - seq(str): the sequence based on a joint reconstruction
+> - seq(Sequence): The sequence based on a joint reconstruction
 >   if the BranchPoint is an ancestor otherwise it is just
->   the sequence of an extant.
+>   the sequence of an extant. Contains a Sequence object.
 
 ### SymNode
 

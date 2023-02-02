@@ -13,8 +13,8 @@ import math
 
 
 class Sequence(object):
-    """ A biological sequence. Stores the sequence itself (as a compact array), 
-    the alphabet (i.e., type of sequence it is), and optionally a name and further 
+    """ A biological sequence. Stores the sequence itself (as a compact array),
+    the alphabet (i.e., type of sequence it is), and optionally a name and further
     information. """
 
     def __init__(self, sequence, alphabet=None, name: str = '', info: str = '', gappy=False):
@@ -33,7 +33,7 @@ class Sequence(object):
 
             length(int): The number of symbols that the sequence is composed of
 
-            gappy(bool): True if the sequence has "gaps", i.e. positions that 
+            gappy(bool): True if the sequence has "gaps", i.e. positions that
 
             represent deletions relative another sequence
 
@@ -44,7 +44,7 @@ class Sequence(object):
         >>> myseq.alphabet.symbols
         will output the standard protein alphabet:
         ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q',
-        'R', 'S', 'T', 'V', 'W', 'Y'] 
+        'R', 'S', 'T', 'V', 'W', 'Y']
         """
 
         self.sequence = sequence
@@ -55,6 +55,7 @@ class Sequence(object):
         if not alphabet is None:
             for sym in self.sequence:
                 # error check: bail out
+
                 if not sym in alphabet and (sym != '-' or not gappy):
                     raise RuntimeError(
                         'Invalid symbol: %c in sequence %s' % (sym, name))
@@ -113,7 +114,7 @@ class Sequence(object):
         >>> seq = Sequence('ACGGTAGGA', DNA_Alphabet)
         >>> print ('T' in seq)
         True
-            which is equivalent to 
+            which is equivalent to
         >>> print (seq.__contains__('T'))
         True
         >>> print ('X' in seq)
@@ -126,7 +127,7 @@ class Sequence(object):
 
     def __getitem__(self, ndx):
         """ Retrieve a specified index (or a "slice" of indices) of the sequence data.
-            Calling self.__getitem__(3) is equivalent to self[3] 
+            Calling self.__getitem__(3) is equivalent to self[3]
         """
         if type(ndx) is slice:
             return ''.join(self.sequence[ndx])
@@ -171,6 +172,41 @@ class Sequence(object):
             degapped, idxs = self.getDegapped()
             idx = ''.join(degapped).find(findme)
             return idxs[idx] if idx >= 0 else -1
+
+    def count(self, findme=None):
+        """Get the number of occurrences of specified symbol findme OR
+        if findme = None, return a dictionary of counts of all symbols
+        in alphabet
+        """
+
+        if findme != None:
+            cnt = 0
+            for sym in self.sequence:
+                if findme == sym:
+                    cnt = cnt + 1
+            return cnt
+        else:
+            symbolCounts = {}
+            for symbol in self.alphabet:
+                symbolCounts[symbol] = self.count(symbol)
+            return symbolCounts
+
+    def getKmers(self, k: int):
+        """ Retrieve k-mers of sequence with counts in canonical (alphabet-based) order """
+        if self.gappy == False:
+            myseq = self.sequence
+        else:  # if the sequence is gappy AND the function is called with gappy = True THEN run the find on the de-gapped sequence
+            myseq, idxs = self.getDegapped()
+        counts = [0 for _ in range(len(self.alphabet) ** k)]
+        for i in range(len(myseq) - k):
+            sub = myseq[i:i + k]
+            idx = 0
+            multiplier = 1
+            for s in sub:
+                idx += self.alphabet.index(s) * multiplier
+                multiplier *= len(self.alphabet)
+            counts[idx] += 1
+        return counts
 
 
 """
