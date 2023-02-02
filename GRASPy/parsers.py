@@ -66,13 +66,12 @@ def find_comma(s: str, level: int = 0) -> list[int]:
     return coms
 
 
-def make_label(child: str, isLabeled: bool, idx: int, count: int) -> str:
+def make_label(child: str, idx: int, count: int) -> str:
     """
     Used within the nwk_split method to create labels for nodes.
 
     Parameters:
         child(str): current child 
-        isLabeled(bool): if the child has a label or not 
         idx(int): marks where the child label begins
         count(int): the current ancestor node count 
 
@@ -80,17 +79,10 @@ def make_label(child: str, isLabeled: bool, idx: int, count: int) -> str:
         str: The label of the node 
     """
 
-    if isLabeled:
-        label = str(count) + \
-            ":" + child[idx+1:].split(":")[1]
-
-    else:
-        label = str(count) + child[idx+1:]
-
-    return label
+    return (str(count) + ":" + child[idx+1:].split(":")[1])
 
 
-def nwk_split(n: str, data=None, isLabeled=False) -> dict:
+def nwk_split(n: str, data=None) -> dict:
     """Performs a depth first search (DFS) of a nwk string and records
     the order of sequences and the parent of each node. Note the 
     recursive nature of the function. 
@@ -116,7 +108,7 @@ def nwk_split(n: str, data=None, isLabeled=False) -> dict:
 
     # Assigns an internal node a number starting with 0 at the root
 
-    parent = make_label(n, isLabeled, end, data["count"])
+    parent = make_label(n, end, data["count"])
 
     data["order"].append(parent)
 
@@ -157,12 +149,12 @@ def nwk_split(n: str, data=None, isLabeled=False) -> dict:
             # implies another ancestor has been found
             data["count"] += 1
 
-            label = make_label(child, isLabeled, p_end, data["count"])
+            label = make_label(child, p_end, data["count"])
 
             data["Parents"][label] = parent
 
             # repeat on the next ancestor
-            nwk_split(child, data, isLabeled)
+            nwk_split(child, data)
 
     return data
 
@@ -184,7 +176,7 @@ def nwkToJSON(nwk: str) -> dict:
     # find the first ')' to locate the root
     end = len(nwk) - nwk[::-1].find(")")
 
-    # no internal node labels or root distance
+    # standard nwk format e.g ...);
     if nwk[end:] == ";":
 
         # remove ;  and add root distance
@@ -192,19 +184,19 @@ def nwkToJSON(nwk: str) -> dict:
 
         raw_tree = nwk_split(job)
 
-    # root has dist but no internal nodes e.g. ...):0.123;
-    elif nwk[end:].split(":")[0] == "":
+    # for nwk output from a GRASP job e.g ...)N0;
+    elif len(nwk[end:].split(":")) == 1:
 
-        job = nwk[:end] + nwk[end:-1]
+        job = nwk[:-1] + ":0"
 
         raw_tree = nwk_split(job)
 
-    # for nwk output from a GRASP job e.g ...)N0;
-    elif nwk[end:].split(":")[0] != "":
+    # for nwk output from GRASPy e.g ...)N0:0.0;
+    elif len(nwk[end:].split(":")) == 2:
 
         job = nwk[:-1]
 
-        raw_tree = nwk_split(job, isLabeled=True)
+        raw_tree = nwk_split(job)
 
     else:
         raise RuntimeError("nwk in unsupported or incorrect format")

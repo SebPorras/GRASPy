@@ -21,7 +21,7 @@ Parameters:
 
 Returns:
 
-> str: {"Job":<job-number>, "Result":{<result-JSON>}}
+> str: {"Job": job-number, "Result":{result-JSON}}
 
 Example
 
@@ -53,7 +53,7 @@ Parameters:
 
 Returns:
 
-> str: {"Job":<job-number>, "Result":{RESULT}}
+> str: {"Job": job-number, "Result":{RESULT}}
 
 Example
 
@@ -84,7 +84,7 @@ Parameters:
 
 Returns:
 
-> str: {"Job":<job-number>, "Result":{<result-JSON>}}
+> str: {"Job": job-number, "Result":{result-JSON}}
 
 Example
 
@@ -119,7 +119,7 @@ Parameters:
 
 Returns:
 
-> str: {"Job":<job-number>}
+> str: {"Job": job-number}
 
 Example
 
@@ -151,7 +151,7 @@ Parameters:
 
 Returns:
 
-> str: {'Status': 'COMPLETED', 'Job': job_id}
+> str: {'Status': 'COMPLETED', 'Job': job-number}
 
 Example
 
@@ -167,7 +167,7 @@ Socket connected to 10.139.1.21 on IP 4072
 
 Closing socket...
 
-{'Status': 'COMPLETED', 'Job': 39}
+{'Status': 'COMPLETED', 'Job': job-number}
 ```
 
 ## Commands
@@ -206,7 +206,7 @@ Socket connected to 10.139.1.21 on IP 4072
 
 Closing socket...
 
-{"Message":"Queued","Job":19}
+{"Message":"Queued","Job": job-number}
 
 ```
 
@@ -241,13 +241,13 @@ Socket connected to 10.139.1.21 on IP 4072
 
 Closing socket...
 
-{"Job":<job-number>, "Result":{<result-JSON>}}
+{"Job":<job-number>, "Result":{result-JSON}}
 
 ```
 
 ### LearnLatentDistributions
 
-    LearnLatentDistributions(nwk: str, states: list[str], data: str, auth: str = "Guest"):
+    LearnLatentDistributions(nwk: str, states: list[str], data: str, auth: str = "Guest")
 
 Learns the distribution of an arbitrary number of discrete
 states. The output from the job will be a new/refined distribution.
@@ -261,7 +261,7 @@ Parameters:
 
 Returns:
 
-> str - Job number
+> str: {"Message":"Queued","Job": job-number}
 
 Example
 
@@ -276,7 +276,46 @@ Socket connected to 10.139.1.21 on IP 4072
 
 Closing socket...
 
-{"Job":<job-number>, "Result":{<result-JSON>}}
+{'Message': 'Queued', 'Job': 42}
+```
+
+### MarginaliseDistOnAncestor
+
+    MarginaliseDistOnAncestor(nwk: str, states: list[str], data: str, distrib: dict, ancestor: int, leaves_only: bool = True, auth: str = "Guest"):
+
+Marginalises on an ancestral node using the latent
+distributions determined from LearnLatentDistributions().
+Although its possible, I have not added parameters for
+rate, seed or gamma values.
+
+Parameters:
+
+> - nwk(str) = path to file name of nwk
+> - states(list) = a list of names for states
+> - data(str) = path to csv with data
+> - distrib(dict) = a previously trained distribution from data
+> - ancestor(int) = Specify which ancestor to marginalise on
+> - leaves_only(bool) = ...
+> - auth(str) = Authentication token, defaults to Guest
+
+Returns:
+
+> - str: {"Message":"Queued","Job": job-number}
+
+Example
+
+```console
+>>> MarginaliseDistOnAncestor(nwk="training.nwk", states=["A", "B"], data="train_data.csv", ancetor=0)
+
+Socket created...
+
+Connecting to server...
+
+Socket connected to 10.139.1.21 on IP 4072
+
+Closing socket...
+
+{'Message': 'Queued', 'Job': 42}
 ```
 
 ## Data Structures

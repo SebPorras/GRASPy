@@ -20,11 +20,13 @@ def send_and_recieve(request: dict) -> dict:
 
     j_request = json.dumps(request) + '\n'
 
+    print(j_request)
+
     j_response = client.sendRequest(j_request)
 
-    response = json.loads(j_response)
+    print(f"{j_response=}")
 
-    print(response)
+    response = json.loads(j_response)
 
     return response
 
@@ -256,10 +258,17 @@ def LearnLatentDistributions(nwk: str,
 
     for val in csv_data["Data"]:
 
+        # replace null with None for JSON compatability
         if pd.isna(val):
             fixed.append([None])
-        else:
+
+        # convert into float for single observation
+        elif isinstance(val, float):
             fixed.append([val])
+
+        # if multiple values, place in a list
+        elif isinstance(val, str):
+            fixed.append([float(obs) for obs in val.split()])
 
     j_data["Data"] = fixed
     params["Dataset"] = j_data
@@ -270,20 +279,27 @@ def LearnLatentDistributions(nwk: str,
     return send_and_recieve(request)
 
 
-def InferFromData(nwk: str,
-                  states: list[str],
-                  data: str,
-                  distrib: dict,
-                  auth: str = "Guest"
-                  ) -> dict:
-    """Refines a current distribution based on a previous output 
-    from requestTrainFromData(). 
+def MarginaliseDistOnAncestor(nwk: str,
+                              states: list[str],
+                              data: str,
+                              distrib: dict,
+                              ancestor: int,
+                              leaves_only: bool = True,
+                              auth: str = "Guest",
+                              ) -> dict:
+    """Marginalises on an ancestral node using the latent 
+    distributions determined from LearnLatentDistributions().
+
+    Although its possible, I have not added parameters for 
+    rate, seed or gamma values. 
 
     Parameters:
         nwk(str) = path to file name of nwk 
         states(list) = a list of names for states
         data(str) = path to csv with data
         distrib(dict) = a previously trained distribution from data 
+        ancestor(int) = Specify which ancestor to marginalise on
+        leaves_only(bool) = ...
         auth(str) = Authentication token, defaults to Guest
 
     Returns:
@@ -298,6 +314,10 @@ def InferFromData(nwk: str,
     params = dict()
 
     params["States"] = states
+    params["Inference"] = "Marginal"
+    params["Ancestor"] = ancestor
+    params["Leaves-only"] = leaves_only
+    params["Distrib"] = distrib
 
     # format tree
     with open(nwk, 'r') as f:
@@ -313,22 +333,26 @@ def InferFromData(nwk: str,
     j_data = dict()
     j_data["Headers"] = csv_data["Headers"].tolist()
 
-    fixed = []
-
-    for val in csv_data["Data"]:
-
-        if pd.isna(val):
-            fixed.append([None])
-        else:
-            fixed.append([val])
-
-    j_data["Data"] = fixed
     params["Dataset"] = j_data
 
-    # load previous distribution
-    params["Distrib"] = distrib
+    formatted = []
 
-    # load all parameters
+    for annot in csv_data["Data"]:
+
+        # replace null with None for JSON compatability
+        if pd.isna(annot):
+            formatted.append([None])
+
+        # convert into float for single observation
+        elif isinstance(annot, float):
+            formatted.append([annot])
+
+        # if multiple values, place in a list
+        elif isinstance(annot, str):
+            formatted.append([float(obs) for obs in annot.split()])
+
+    j_data["Data"] = formatted
+
     request["Params"] = params
 
     return send_and_recieve(request)
