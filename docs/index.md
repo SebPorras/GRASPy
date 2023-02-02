@@ -379,7 +379,7 @@ Parameters:
 
 #### writeToNwk
 
-    pog_tree.writeToNwk(file_name: str, root: str = "N0")
+    writeToNwk(file_name: str, root: str = "N0")
 
 Converts the POGTree object into a nwk string and writes this to a file
 
@@ -399,6 +399,30 @@ Example
 >>> nwk = tree.writeNwk(test_nwk.nwk)
 >>> print(nwk)
 (XP_004050792.2:0.040380067,XP_005216113.1:0.028035396,(XP_018963554.1:0.016721581,XP_016357833.1:0.024301326)N1:0.347992941)N0:0;
+```
+
+#### writeToFasta
+
+    writeToFasta(file_name: str)
+
+Writes all sequences of the tree to file.
+Sequence for ancestors are based on a joint
+reconstruction and each symbol is the most likely
+at each position.
+
+Parameters:
+
+> - file_name(str) : name of fasta file
+
+Returns:
+
+> None
+
+Example
+
+```console
+>>>POGTree("test_fasta")
+>>>
 ```
 
 ### BranchPoint

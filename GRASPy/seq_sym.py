@@ -14,7 +14,7 @@ class Alphabet(object):
     Alphabets are used to define probability distributions for stochastic events
     (see prob.py). """
 
-    def __init__(self, symbolString):
+    def __init__(self, symbolString, name=None):
         """ Construct an alphabet from a string of symbols. Lower case characters
         will be converted to upper case, repeated characters are ignored.
         Example of constructing the DNA alphabet:
@@ -33,6 +33,8 @@ class Alphabet(object):
         self.symbols = tuple(_symbols)
         self.length = len(self.symbols)
         self.annotations = {}
+        # record the alphabet name
+        self.name = name
 
     def __str__(self):
         return str(self.symbols)
@@ -119,10 +121,10 @@ class Alphabet(object):
 
 """ Below we declare alphabets that are going to be available when
 this module is imported """
-Bool_Alphabet = Alphabet('TF')
-DNA_Alphabet = Alphabet('ACGT-')
-RNA_Alphabet = Alphabet('ACGU-')
-Protein_Alphabet = Alphabet('ACDEFGHIKLMNPQRSTVWY-')
+Bool_Alphabet = Alphabet('TF', name="Bool")
+DNA_Alphabet = Alphabet('ACGT-', name="DNA")
+RNA_Alphabet = Alphabet('ACGU-', name="RNA")
+Protein_Alphabet = Alphabet('ACDEFGHIKLMNPQRSTVWY-', name="Protein")
 
 
 predefAlphabets = {'Bool_Alphabet': Bool_Alphabet,

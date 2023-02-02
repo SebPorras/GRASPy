@@ -20,13 +20,11 @@ def send_and_recieve(request: dict) -> dict:
 
     j_request = json.dumps(request) + '\n'
 
-    print(j_request)
-
     j_response = client.sendRequest(j_request)
 
-    print(f"{j_response=}")
-
     response = json.loads(j_response)
+
+    print(response)
 
     return response
 
@@ -331,9 +329,8 @@ def MarginaliseDistOnAncestor(nwk: str,
     csv_data = pd.read_csv(data)
 
     j_data = dict()
-    j_data["Headers"] = csv_data["Headers"].tolist()
 
-    params["Dataset"] = j_data
+    j_data["Headers"] = csv_data["Headers"].tolist()
 
     formatted = []
 
@@ -352,6 +349,8 @@ def MarginaliseDistOnAncestor(nwk: str,
             formatted.append([float(obs) for obs in annot.split()])
 
     j_data["Data"] = formatted
+
+    params["Dataset"] = j_data
 
     request["Params"] = params
 

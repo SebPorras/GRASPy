@@ -70,7 +70,7 @@ class Sequence(object):
                         valid = False
                         break
                 if valid:
-                    self.alphabet = alphaName
+                    self.alphabet = alpha
                     break
 
             if self.alphabet is None:
@@ -281,15 +281,17 @@ def parseDefline(string):
         return (s, '', '', '')
 
 
-def readFastaFile(filename, alphabet=None, ignore=False, gappy=False, parse_defline=True):
+def readFastaFile(filename, alphabet=None, ignore=False, gappy=False,
+                  parse_defline=True):
     """ Read the given FASTA formatted file and return the list of sequences
-        contained within it. Note that if alphabet is NOT specified, it will take a
-        separate guess for each sequence.
+        contained within it. Note that if alphabet is NOT specified, it will
+        take a separate guess for each sequence.
         If ignore is False, errors cause the method to fail.
         If ignore is True, errors will disregard sequence.
         If gappy is False (default), sequence cannot contain gaps,
         if True gaps are accepted and included in the resulting sequences.
-        If parse_defline is False, the name will be set to everything before the first space, else parsing will be attempted."""
+        If parse_defline is False, the name will be set to everything before
+        the first space, else parsing will be attempted."""
     fh = open(filename)
     seqlist = []
     batch = ''  # a batch of rows including one or more complete FASTA entries

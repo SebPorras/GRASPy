@@ -9,7 +9,8 @@
 
 
 from . import pog_graph
-from typing import Union
+from . import sequence
+from typing import Union, Optional
 
 
 class BranchPoint(object):
@@ -19,20 +20,20 @@ class BranchPoint(object):
     """
 
     def __init__(self, id: str, parent: Union[str, None], dist: float,
-                 children: list[str], seq: str = "") -> None:
+                 children: list[str], seq: Optional[sequence.Sequence] = None) -> None:
         """ Constructs instance of a branchpoint.
 
         Parameters:
             id(str): Sequence ID
 
-            parent(str or None]): ID of parent 
+            parent(str or None]): ID of parent
 
             dist(float): Distance to parent
 
             children(list): IDs children of current BranchPoint
 
-            seq(str): the sequence based on a joint reconstruction 
-            if the BranchPoint is an ancestor otherwise it is just 
+            seq(str): the sequence based on a joint reconstruction
+            if the BranchPoint is an ancestor otherwise it is just
             the sequence of an extant.
         """
 
@@ -48,7 +49,7 @@ class BranchPoint(object):
 
 
 class POGTree(object):
-    """The Partial Order Graph Tree (POGTree), is a phylogenetic tree made up 
+    """The Partial Order Graph Tree (POGTree), is a phylogenetic tree made up
     of branchpoints which represent nodes on the tree.
     Each branchpoint is assigned an index and a BranchPoint
     object, allowing easy access of information via the sequence name of
@@ -90,11 +91,12 @@ class POGTree(object):
         self.distances = distances
         self.graphs = POGraphs
 
-        # Annotate branchpoints with any sequences
+        # Annotate branchpoints with Sequences
         for key, value in self.graphs.items():
 
             self.branchpoints[key].seq = \
-                ''.join([s.symbol for s in value.nodes])
+                sequence.Sequence(
+                    ''.join([s.symbol for s in value.nodes]), name=key)
 
     def __str__(self) -> str:
         return f"Number of branchpoints: {self.nBranches}\nParents: {self.parents}\nChildren: {self.children}\nIndices: {self.indices}\nDistances: {self.distances}"
@@ -105,10 +107,10 @@ class POGTree(object):
 
         Parameters:
             root(str): Default set to N0 at the "root" ancestor
-            but can be changed to create subtrees if desired. 
+            but can be changed to create subtrees if desired.
 
         Returns:
-            str: The POGTree in nwk format 
+            str: The POGTree in nwk format
         """
 
         nwk = ""
@@ -132,12 +134,12 @@ class POGTree(object):
     def writeToNwk(self, file_name: str, root: str = "N0") -> str:
         """Writes a nwk string of the tree to a file
 
-        Parameters: 
+        Parameters:
 
             file_name(str): name of nwk file
 
             root(str): Default set to N0 at the "root" ancestor
-            but can be changed to create subtrees if desired. 
+            but can be changed to create subtrees if desired.
         """
 
         nwk = self._parseToNwk(root) + ';'
@@ -146,3 +148,19 @@ class POGTree(object):
             f.write(nwk)
 
         return nwk
+
+    def writeToFasta(self, file_name: str) -> None:
+        """Writes all sequences of the tree to file.
+        Sequence for ancestors are based on a joint 
+        reconstruction and each symbol is the most likely 
+        at each position. 
+
+        Parameters:
+
+            file_name(str): name of fasta file
+        """
+
+        seqs = [bp.seq for bp in self.branchpoints.values()
+                if bp.seq is not None]
+
+        sequence.writeFastaFile(file_name, seqs)

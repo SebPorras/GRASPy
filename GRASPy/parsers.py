@@ -264,7 +264,7 @@ def alnToJSON(file_name: str, data_type: Optional[str] = None) -> dict:
 
     # will guess based on sequence what the alphabet is
     if data_type is None:
-        alignments["Datatype"] = {"Predef": sequences[0].alphabet}
+        alignments["Datatype"] = {"Predef": sequences[0].alphabet.name}
     else:
         alignments["Datatype"] = {"Predef": data_type}
 
