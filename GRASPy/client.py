@@ -71,7 +71,7 @@ def sendRequest(message: str) -> str:
         print("Socket failed to be created")
         sys.exit()
 
-    print("Socket created...\n")
+    #print("Socket created...\n")
 
     HOST = '10.139.1.21'
     PORT = 4072
@@ -92,7 +92,7 @@ def sendRequest(message: str) -> str:
 
     response = receive_message(s)
 
-    print("Closing socket...\n")
+    #print("Closing socket...\n")
 
     s.close()
 

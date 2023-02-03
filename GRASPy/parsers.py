@@ -10,6 +10,7 @@ from typing import Tuple, Union, Optional
 from . import pog_tree
 from . import pog_graph
 import numpy as np
+import pandas as pd
 from . import sequence
 
 
@@ -500,7 +501,7 @@ def POGraphFromJSON(jpog: dict, isAncestor: bool = False) -> pog_graph.POGraph:
                              name=name, isAncestor=isAncestor, nodes=nodes)
 
 
-def POGTreeFromJSON(nwk: Union[str, dict], POG_graphs: dict) -> pog_tree.POGTree:
+def POGTreeFromJointReconstruction(nwk: Union[str, dict], POG_graphs: dict) -> pog_tree.POGTree:
     """Creates an instance of the POGTree data structure. A nwk 
     file OR output from g_requests.requestPOGTree() can be used 
     to create tree topology with the second option also creating 
@@ -562,3 +563,45 @@ def POGTreeFromJSON(nwk: Union[str, dict], POG_graphs: dict) -> pog_tree.POGTree
                             indices=tree['indices'],
                             distances=tree['distances'],
                             POGraphs=graphs)
+
+
+def csvDataToJSON(file_name: str) -> dict[str, list]:
+    """Reads in datafile and formats in the correct format for use 
+    in LearnLatentDistributions and MarginaliseDistOnAncestor. 
+
+    Bnkit requires that data must be in a square matrix, therefore 
+    the number of observations must be uniform and null values are 
+    in the place of "missing" observations.
+
+    Column names in CSV MUST be called "Headers" & "Data" 
+
+    If there are multiple observations for an annotation,
+    separate the observations with whitespace within a cell
+    e.g. "7.0 3.3" 
+    """
+
+    # None get converted to null for JSON
+    raw = pd.read_csv(file_name).replace(pd.NA, None)
+
+    j_data = dict()
+
+    # Headers represent names of sequences
+    j_data["Headers"] = raw["Headers"].tolist()
+
+    # place observations within lists and convert multiple
+    # observations into floats
+    formatted = [[float(obs) for obs in annot.split()] if isinstance(annot, str)
+                 else [annot] for annot in raw["Data"]]
+
+    # find the largest list which represents the max number of datapoints
+    max_len = len(max(formatted, key=lambda x: len(x)))
+
+    # add null values to ensure that there is uniform length
+    for obs in formatted:
+        if len(obs) < max_len:
+            while len(obs) < max_len:
+                obs.append(None)
+
+    j_data["Data"] = formatted
+
+    return j_data

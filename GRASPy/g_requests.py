@@ -10,7 +10,6 @@
 import json
 from . import client
 from . import parsers
-import pandas as pd
 from typing import Optional
 
 
@@ -213,7 +212,7 @@ def JointReconstruction(aln: str, nwk: str,
 
 def LearnLatentDistributions(nwk: str,
                              states: list[str],
-                             data: str,
+                             csv_data: str,
                              auth: str = "Guest"
                              ) -> dict:
     """Learns the distribution of an arbitrary number of discrete 
@@ -222,7 +221,7 @@ def LearnLatentDistributions(nwk: str,
     Parameters:
         nwk(str) = path to file name of nwk 
         states(list) = a list of names for each latent states
-        data(str) = path to csv with data 
+        csv_data(str) = path to csv with data 
         auth(str) = Authentication token, defaults to Guest
 
     Returns:
@@ -246,29 +245,8 @@ def LearnLatentDistributions(nwk: str,
 
     params["Tree"] = parsers.nwkToJSON(tree)
 
-    #read in dataset
-    csv_data = pd.read_csv(data)
+    j_data = parsers.csvDataToJSON(csv_data)
 
-    j_data = dict()
-    j_data["Headers"] = csv_data["Headers"].tolist()
-
-    fixed = []
-
-    for val in csv_data["Data"]:
-
-        # replace null with None for JSON compatability
-        if pd.isna(val):
-            fixed.append([None])
-
-        # convert into float for single observation
-        elif isinstance(val, float):
-            fixed.append([val])
-
-        # if multiple values, place in a list
-        elif isinstance(val, str):
-            fixed.append([float(obs) for obs in val.split()])
-
-    j_data["Data"] = fixed
     params["Dataset"] = j_data
 
     # load all parameters
@@ -279,7 +257,7 @@ def LearnLatentDistributions(nwk: str,
 
 def MarginaliseDistOnAncestor(nwk: str,
                               states: list[str],
-                              data: str,
+                              csv_data: str,
                               distrib: dict,
                               ancestor: int,
                               leaves_only: bool = True,
@@ -294,7 +272,7 @@ def MarginaliseDistOnAncestor(nwk: str,
     Parameters:
         nwk(str) = path to file name of nwk 
         states(list) = a list of names for states
-        data(str) = path to csv with data
+        csv_data(str) = path to csv with data
         distrib(dict) = a previously trained distribution from data 
         ancestor(int) = Specify which ancestor to marginalise on
         leaves_only(bool) = ...
@@ -325,30 +303,7 @@ def MarginaliseDistOnAncestor(nwk: str,
 
     params["Tree"] = parsers.nwkToJSON(tree)
 
-    #read in dataset
-    csv_data = pd.read_csv(data)
-
-    j_data = dict()
-
-    j_data["Headers"] = csv_data["Headers"].tolist()
-
-    formatted = []
-
-    for annot in csv_data["Data"]:
-
-        # replace null with None for JSON compatability
-        if pd.isna(annot):
-            formatted.append([None])
-
-        # convert into float for single observation
-        elif isinstance(annot, float):
-            formatted.append([annot])
-
-        # if multiple values, place in a list
-        elif isinstance(annot, str):
-            formatted.append([float(obs) for obs in annot.split()])
-
-    j_data["Data"] = formatted
+    j_data = parsers.csvDataToJSON(csv_data)
 
     params["Dataset"] = j_data
 
