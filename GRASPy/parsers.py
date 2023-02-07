@@ -2,7 +2,7 @@
 # Date: 17/01/22
 # Author: Sebastian Porras
 # Aims: Any scripts related to translating one form of data into another.
-# Most functions convert to and from JSON format into the various Classes
+# Most functions convert to and from JSON format into the various classes
 # and also any string formating functions.
 ###############################################################################
 
@@ -192,11 +192,10 @@ def nwkToJSON(nwk: str) -> dict:
 
         raw_tree = nwk_split(job)
 
-    # for nwk output from GRASPy e.g ...)N0:0.0;
+    # for nwk output from GRASPy e.g ...)I:0.2;
     elif len(nwk[end:].split(":")) == 2:
-
-        job = nwk[:-1]
-
+        #job = nwk[:-1]
+        job = nwk[:end] + ":0"
         raw_tree = nwk_split(job)
 
     else:
@@ -568,6 +567,9 @@ def POGTreeFromJointReconstruction(nwk: Union[str, dict], POG_graphs: dict) -> p
 def csvDataToJSON(file_name: str) -> dict[str, list]:
     """Reads in datafile and formats in the correct format for use 
     in LearnLatentDistributions and MarginaliseDistOnAncestor. 
+
+    ONLY implemented for continuous values not discrete multinomial 
+    symbols.
 
     Bnkit requires that data must be in a square matrix, therefore 
     the number of observations must be uniform and null values are 

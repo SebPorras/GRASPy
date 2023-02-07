@@ -218,6 +218,9 @@ def LearnLatentDistributions(nwk: str,
     """Learns the distribution of an arbitrary number of discrete 
     states. The output from the job will be a new/refined distribution. 
 
+    ONLY implemented for continuous values not discrete multinomial 
+    symbols.
+
     Parameters:
         nwk(str) = path to file name of nwk 
         states(list) = a list of names for each latent states
@@ -265,6 +268,9 @@ def MarginaliseDistOnAncestor(nwk: str,
                               ) -> dict:
     """Marginalises on an ancestral node using the latent 
     distributions determined from LearnLatentDistributions().
+
+    ONLY implemented for continuous values not discrete multinomial 
+    symbols.
 
     Although its possible, I have not added parameters for 
     rate, seed or gamma values. 
