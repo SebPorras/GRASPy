@@ -1,9 +1,10 @@
 # GRASPy
+
 A Python API for using the Graphical Representation of Ancestral Sequence Predictions (GRASP)
 
 Read the docs at - https://sebporras.github.io/GRASPy/
 
-# Install instructions 
+# Install instructions
 
 1. Clone this repository to your computer
 
@@ -11,24 +12,30 @@ Read the docs at - https://sebporras.github.io/GRASPy/
 git clone https://github.com/SebPorras/GRASPy.git
 ```
 
-2. Create a conda environment 
+2. Create a conda environment
 
 ```
 conda create -n GRASPy python=3.9
 ```
 
-3. Activate environment 
+3. Activate environment
 
 ```
-conda activate GRASPy 
+conda activate GRASPy
 ```
 
-4. Install the required Python packages 
+4. Install the required Python packages
 
 ```
 pip install -r ./GRASPy/requirements.txt
 ```
 
-# Quick tutorial 
+5. Import GRASPy to your notebook or Python scripts
 
-- For an example of how to use the API, view example_workflow.ipynb 
+```
+import GRASPy as gp
+```
+
+# Quick tutorial
+
+- For an example of how to use the API, view example_workflow.ipynb

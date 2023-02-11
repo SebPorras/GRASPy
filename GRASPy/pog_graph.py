@@ -56,7 +56,7 @@ class SymNode(object):
     and all of the edges at this position.
     """
 
-    def __init__(self, name: int, symbol: str, edges: list) -> None:
+    def __init__(self, name: int, symbol: str, edges: list[Edge]) -> None:
         """Constructs instance of the object.
 
         Parameters:

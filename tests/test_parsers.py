@@ -1,5 +1,6 @@
 import pytest
 import GRASPy as gp
+import numpy as np
 
 
 @pytest.mark.parametrize("p_input, p_output", [
@@ -100,3 +101,49 @@ def test_TreeFromJSON(json_tree, idx_tree):
 
     assert (tree['nBranches'], list(tree["branchpoints"]), tree["parents"],
             tree["children"], tree["indices"], tree["distances"]) == idx_tree
+
+
+@pytest.mark.parametrize('path, json', [
+    ('tests/files/aln_protein.fa', {'Sequences': [{'Name': 'N0', 'Seq': ['P', 'P', None, 'P', 'T', None, 'P']},
+                                                  {'Name': 'N1', 'Seq': [
+                                                   'P', 'P', None, 'P', 'T', None, 'P']},
+                                                  {'Name': 'N2', 'Seq': ['P', 'P', None, 'P', 'K', None, 'P']}],
+                                    'Datatype': {'Predef': 'Protein'}}),
+    ('tests/files/aln_rna.fa', {'Sequences': [{'Name': 'N0', 'Seq': ['A', 'U', None, 'G', 'C', None, 'A']},
+                                              {'Name': 'N1', 'Seq': [
+                                                  'A', 'U', None, 'C', 'G', None, 'A']},
+                                              {'Name': 'N2', 'Seq': ['G', 'U', None, 'G', 'C', None, 'A']}],
+                                'Datatype': {'Predef': 'RNA'}}),
+    ('tests/files/aln_dna.fa', {'Sequences': [{'Name': 'N0', 'Seq': ['A', 'T', None, 'G', 'C', None, 'A']},
+                                              {'Name': 'N1', 'Seq': [
+                                                  'A', 'T', None, 'C', 'G', None, 'A']},
+                                              {'Name': 'N2', 'Seq': ['G', 'T', None, 'G', 'C', None, 'A']}],
+                                'Datatype': {'Predef': 'DNA'}})
+
+
+])
+def test_alnToJSON(path, json):
+
+    assert gp.alnToJSON(path) == json
+
+
+@pytest.mark.parametrize("input, edge", [
+    # end of sequence
+    ([[485], [[]], 0], [485, -999]),
+
+    ([[484], [[485]], 0], [484, 485])
+])
+def test_makeEdges(input, edge):
+    e = gp.makeEdges(input[0], input[1], input[2])
+    assert (e[0].start, e[0].end) == (edge[0], edge[1])
+
+
+@pytest.mark.parametrize("input, location", [
+    ({"Edges": [[-1, 0]], "Idx": 0, "indices": np.array([0, 1, 2])}, 0),
+    ({"Edges": [[1, 3], [-1, 0]], "Idx": 0, "indices": np.array([0, 1, 2])}, 1)
+
+])
+def test_locateEdgeIndex(input, location):
+
+    assert gp.locateEdgeIndex(
+        input["Edges"], input["Idx"], input["indices"]) == location

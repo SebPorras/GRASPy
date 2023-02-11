@@ -16,9 +16,9 @@ from . import sequence
 
 def find_p(s: str) -> Tuple[int, int]:
     """Locates the first index positions for the top most
-    embedding within a nwk string. This allows substrings 
+    embedding within a nwk string. This allows substrings
     to be located
-    For example: 
+    For example:
 
     (A:1,(B:2)C:3)D:4; -> 0, 13
     """
@@ -37,16 +37,16 @@ def find_p(s: str) -> Tuple[int, int]:
 
 def find_comma(s: str, level: int = 0) -> list[int]:
     """
-    Finds all commas within a particular embedding level for 
-    a nwk string. This essentially locates where children are 
-    to allow subsetting of the string. 
+    Finds all commas within a particular embedding level for
+    a nwk string. This essentially locates where children are
+    to allow subsetting of the string.
 
     Parameters:
-        s(str): nwk string 
-        level(int): current embedding level 
+        s(str): nwk string
+        level(int): current embedding level
 
     Returns:
-        list: contains indices for each comma within 
+        list: contains indices for each comma within
         the embedding
     """
 
@@ -72,12 +72,12 @@ def make_label(child: str, idx: int, count: int) -> str:
     Used within the nwk_split method to create labels for nodes.
 
     Parameters:
-        child(str): current child 
+        child(str): current child
         idx(int): marks where the child label begins
-        count(int): the current ancestor node count 
+        count(int): the current ancestor node count
 
     Returns:
-        str: The label of the node 
+        str: The label of the node
     """
 
     return (str(count) + ":" + child[idx+1:].split(":")[1])
@@ -85,14 +85,14 @@ def make_label(child: str, idx: int, count: int) -> str:
 
 def nwk_split(n: str, data=None) -> dict:
     """Performs a depth first search (DFS) of a nwk string and records
-    the order of sequences and the parent of each node. Note the 
-    recursive nature of the function. 
+    the order of sequences and the parent of each node. Note the
+    recursive nature of the function.
 
     Parameters:
-        n(str): The nwk string 
+        n(str): The nwk string
         data(None): will record tree info during DFS
-        isLabeled(bool): marks if internal nodes have 
-        been assigned labels or not. 
+        isLabeled(bool): marks if internal nodes have
+        been assigned labels or not.
 
     Returns:
         dict: contains order and parents for each node
@@ -137,41 +137,38 @@ def nwk_split(n: str, data=None) -> dict:
         # look for the next embedding within "(...)"
         p_start, p_end = find_p(child)
 
-        # this is the base case for an extant sequence
-        if p_start == -1 and p_end == -1:
-
-            data["order"].append(child)
-
-            # record the parent of this current child
-            data["Parents"][child] = parent
-
-        else:
+        if p_start != -1 and p_end != -1:
 
             # implies another ancestor has been found
             data["count"] += 1
 
-            label = make_label(child, p_end, data["count"])
-
-            data["Parents"][label] = parent
+            data["Parents"][make_label(child, p_end, data["count"])] = parent
 
             # repeat on the next ancestor
             nwk_split(child, data)
+
+            continue
+
+        data["order"].append(child)
+
+        # record the parent of this current child
+        data["Parents"][child] = parent
 
     return data
 
 
 def nwkToJSON(nwk: str) -> dict:
     """Parses a nwk string into a JSON format.
-    This method assumes that a tree either has no names for internal 
-    nodes OR that the internal nodes have been named according to 
-    GRASP's naming system i.e. N0, N1 etc.   
+    This method assumes that a tree either has no names for internal
+    nodes OR that the internal nodes have been named according to
+    GRASP's naming system i.e. N0, N1 etc.
 
     Parameters:
-        nwk(str): A nwk string 
+        nwk(str): A nwk string
 
     Returns:
         dict: Contains a representation of an IdxTree in
-        JSON format. 
+        JSON format.
     """
 
     # find the first ')' to locate the root
@@ -183,39 +180,40 @@ def nwkToJSON(nwk: str) -> dict:
         # remove ;  and add root distance
         job = nwk[:-1] + ":0"
 
-        raw_tree = nwk_split(job)
-
     # for nwk output from a GRASP job e.g ...)N0;
     elif len(nwk[end:].split(":")) == 1:
 
         job = nwk[:-1] + ":0"
 
-        raw_tree = nwk_split(job)
-
     # for nwk output from GRASPy e.g ...)I:0.2;
     elif len(nwk[end:].split(":")) == 2:
-        #job = nwk[:-1]
+        # job = nwk[:-1]
         job = nwk[:end] + ":0"
-        raw_tree = nwk_split(job)
 
     else:
         raise RuntimeError("nwk in unsupported or incorrect format")
 
+    raw_tree = nwk_split(job)
+
+    # record what the indices that will be assigned to each node
     idxs = {name: i for i, name in enumerate(raw_tree["order"])}
 
     Parents = []
     Labels = []
     Distances = []
 
+    # add information to idx tree in a DFS order
     for i, node in enumerate(raw_tree["order"]):
 
+        # grab name for node
         Labels.append(node.split(":")[0])
+        # grab distance of that node
         Distances.append(float(node.split(":")[1]))
 
-        if i == 0:
-            p_idx = -1
-        else:
-            # grab the index of the parent for this node
+        # record index of the parent, -1 for root parent
+        p_idx = -1
+
+        if i != 0:
             p_idx = idxs[(raw_tree["Parents"][node])]
 
         Parents.append(p_idx)
@@ -236,8 +234,8 @@ def alnToJSON(file_name: str, data_type: Optional[str] = None) -> dict:
 
     Parameters:
         file_name(str): path to aln file
-        data_type(str): user must specify what alignment letters are 
-        e.g DNA or Protein otherwise it will guess 
+        data_type(str): user must specify what alignment letters are
+        e.g DNA or Protein otherwise it will guess
 
     Returns:
         list: alignment seqs in JSON format
@@ -246,7 +244,7 @@ def alnToJSON(file_name: str, data_type: Optional[str] = None) -> dict:
 
     sequences = sequence.readFastaFile(file_name)
 
-    seqs = []
+    j_seqs = []
 
     for seq in sequences:
 
@@ -257,18 +255,40 @@ def alnToJSON(file_name: str, data_type: Optional[str] = None) -> dict:
         # remove any gap characters
         tmp["Seq"] = [None if s == "-" else s for s in seq.sequence]
 
-        seqs.append(tmp)
+        j_seqs.append(tmp)
 
     alignments = dict()
-    alignments["Sequences"] = seqs
+    alignments["Sequences"] = j_seqs
 
     # will guess based on sequence what the alphabet is
     if data_type is None:
-        alignments["Datatype"] = {"Predef": sequences[0].alphabet.name}
-    else:
-        alignments["Datatype"] = {"Predef": data_type}
+        data_type = sequences[0].alphabet.name
+
+    alignments["Datatype"] = {"Predef": data_type}
 
     return alignments
+
+
+def make_anc_label(jlabels: dict, i: int) -> str:
+
+    lab = jlabels[i]
+
+    if lab.isdigit():
+        lab = "N" + lab
+
+    return lab
+
+
+def record_children(PIdx: int, parents: list, nBranches: int):
+
+    curr_children = [CIdx for CIdx in range(
+        nBranches) if parents[CIdx] == PIdx]
+
+    # Leaves will have no children which is recorded accordingly
+    if len(curr_children) == 0:
+        curr_children = [None]
+
+    return curr_children
 
 
 def TreeFromJSON(serial: dict) -> dict:
@@ -291,96 +311,108 @@ def TreeFromJSON(serial: dict) -> dict:
     jlabels = serial["Labels"]
     jparents = serial["Parents"]
 
-    # index by child branch point index and map their parent index
-    parents = [jparents[i] for i in range(nBranches)]
+    # map the names of b_points to their index in the tree
+    indices = {make_anc_label(jlabels, i): i for i in range(nBranches)}
 
-    # using same index as branch point, map distances
-    distances = [jdists[i] for i in range(nBranches)]
+    # keep track of the children of each b_point
+    children = [record_children(PIdx, jparents, nBranches)
+                for PIdx in range(nBranches)]
 
-    indices = dict()
-
-    for i in range(nBranches):
-
-        # index by sequence id and map branch point index
-        lab = jlabels[i]
-
-        if lab.isdigit():
-            lab = "N" + lab
-
-        indices[lab] = i
-
-    # Next step is to record children of each parent
-    children = []
-
-    for PIdx in range(nBranches):
-
-        curr_children = []
-
-        # reference parent array and check if it matches current parent index
-        for CIdx in range(nBranches):
-
-            if (parents[CIdx] == PIdx):
-                curr_children.append(CIdx)
-
-        # Leaves will have no children which is recorded accordingly
-        if len(curr_children) == 0:
-            curr_children = [None]
-
-        children.append(curr_children)
-
-    # branch points represent sequences on the tree
     bpoints = {}
 
+    # branch points represent nodes on a tree
     for BIdx in range(nBranches):
 
-        # marks ancestor labels with an 'N' to avoid confusion
-        name = jlabels[BIdx]
-        if name.isdigit():
+        branch_name = make_anc_label(jlabels, BIdx)
 
-            name = "N" + name
+        branch_children = [None if i is None else make_anc_label(
+            jlabels, i) for i in children[BIdx]]
 
-        # convert parent indexes to seq names
-        c_lab = []
+        branch_PIdx = jparents[BIdx]
 
-        if None in children[BIdx]:
-            c_lab.append(None)
+        parent_name = None
 
-        else:
-            for i in children[BIdx]:
+        # -1 is for the root node which has None as its parent
+        if branch_PIdx != -1:
+            parent_name = make_anc_label(jlabels, branch_PIdx)
 
-                lab = jlabels[i]
-
-                if lab.isdigit():
-
-                    lab = "N" + lab
-
-                c_lab.append(lab)
-
-        # convert parent indexes to seq names
-        p_idx = parents[BIdx]
-
-        if p_idx == -1:
-            p = None
-
-        else:
-            p = "N" + jlabels[p_idx]
-
-        bp = pog_tree.BranchPoint(id=name,
-                                  parent=p,
-                                  dist=distances[BIdx],
-                                  children=c_lab)
-
-        bpoints[name] = bp
+        bpoints[branch_name] = pog_tree.BranchPoint(id=branch_name,
+                                                    parent=parent_name,
+                                                    dist=jdists[BIdx],
+                                                    children=branch_children)
 
     tree = {}
     tree['nBranches'] = nBranches
     tree['branchpoints'] = bpoints
-    tree['parents'] = parents
+    tree['parents'] = jparents
     tree['children'] = children
     tree['indices'] = indices
-    tree['distances'] = distances
+    tree['distances'] = jdists
 
     return tree
+
+
+def makeEdges(indices, adj, i) -> list[pog_graph.Edge]:
+    '''Creates a list of Edge objects for a particular node'''
+
+    # set [] to -999 to signify end of seq
+    if len(adj[i]) == 0:
+        return [pog_graph.Edge(start=indices[i], end=-999)]
+
+    # add all adjacent edges, note that ancestors can have multiple adjacent edges
+    return [pog_graph.Edge(start=indices[i], end=adj[i][j]) for j in range(len(adj[i]))]
+
+
+def locateEdgeIndex(edges, i, indices) -> int:
+    '''Finds location of the node where the edge begins'''
+
+    # check if edge starts at -1 -> virtual start
+    if edges[i][0] == -1:
+        # this edge will be added to first real node
+        return 0
+
+    # edges are stored in random order, find index where edge is
+    return np.where(indices == edges[i][0])[0][0]
+
+
+def removeDuplicateEdges(edge: list[int], node: pog_graph.SymNode):
+    '''Ancestors have extra edges that aren't simply adjacent. Some 
+    of the extra edges are identical to the adjacent edges and so 
+    this redundancy is removed'''
+
+    # check if there's already an edge with the same start and end
+    dupeedges = [j for j in range(len(node.edges)) if
+                 (edge[0] == node.edges[j].start and
+                  edge[1] == node.edges[j].end)]
+
+    [node.edges.pop(j) for j in dupeedges]
+
+
+def addAncestralEdges(edgeIndices: list[list[int]], edge_info: dict,
+                      edgeType: str, indices, nodes: list[pog_graph.SymNode]):
+
+    START = 0
+    END = 1
+
+    for i in range(len(edgeIndices)):
+
+        # find position of node where edge begins
+        edge_location = locateEdgeIndex(edgeIndices, i, indices)
+
+        ancestor_node = nodes[edge_location]
+
+        # some edges are identical to adj edges and can be replaced
+        removeDuplicateEdges(edgeIndices[i], ancestor_node)
+
+        edge = pog_graph.Edge(start=edgeIndices[i][START],
+                              end=edgeIndices[i][END],
+                              edgeType=edgeType,
+                              recip=edge_info[i]["Recip"],
+                              backward=edge_info[i]["Backward"],
+                              forward=edge_info[i]["Forward"],
+                              weight=edge_info[i]["Weight"])
+
+        ancestor_node.edges.append(edge)
 
 
 def POGraphFromJSON(jpog: dict, isAncestor: bool = False) -> pog_graph.POGraph:
@@ -397,96 +429,21 @@ def POGraphFromJSON(jpog: dict, isAncestor: bool = False) -> pog_graph.POGraph:
     # each position in a sequence is given an index based on the alignment
     indices = np.array(jpog["Indices"])
 
-    # adjacent edges start at each index and end at value stored there
+    # the index is the start of the edge and the value is the index of the end
     adj = jpog["Adjacent"]
 
-    if len(indices) != len(adj):
-        raise RuntimeError("JSON is incorrectly formatted")
-
-    # contains outgoing edges and the most likely residue
+    # contains the most likely residue at that position
     node_vals = jpog["Nodes"]
-    nodes = []
 
-    for i in range(len(indices)):
-
-        es = []
-
-        # set [] to -999 to signify end of seq
-        if len(adj[i]) == 0:
-            edge = pog_graph.Edge(start=indices[i], end=-999)
-            es.append(edge)
-        else:
-            # there can be multiple adjacent edges for each sequence position
-            for j in range(len(adj[i])):
-
-                edge = pog_graph.Edge(start=indices[i], end=adj[i][j])
-                es.append(edge)
-
-        node = pog_graph.SymNode(name=indices[i],
-                                 symbol=node_vals[i]["Value"], edges=es)
-
-        nodes.append(node)
+    # store node value and all adjacent edges with this node
+    nodes = [pog_graph.SymNode(name=indices[i],
+                               symbol=node_vals[i]["Value"],
+                               edges=makeEdges(indices, adj, i)) for i in range(len(indices))]
 
     if isAncestor:
 
-        # tuple of start and end of each edge
-        edgeInd = jpog["Edgeindices"]
-
-        # extra annotations about each edge
-        edges = jpog["Edges"]
-
-        for i in range(len(jpog["Edgeindices"])):
-
-            edge_info = edges[i]
-
-            # virtual start is always referenced as -1
-            if edgeInd[i][0] == -1:
-
-                # virtual start edges will be assigned to the first "real" node
-                cor_node = nodes[0]
-
-                edge = pog_graph.Edge(start=edgeInd[i][0], end=edgeInd[i][1],
-                                      edgeType=jpog["Edgetype"],
-                                      recip=edge_info["Recip"],
-                                      backward=edge_info["Backward"],
-                                      forward=edge_info["Forward"],
-                                      weight=edge_info["Weight"])
-
-                cor_node.edges.append(edge)
-
-            else:
-
-                # edges are stored in random order, need to find correct start
-
-                # returns a tuple with an array containg correct index
-                node_loc = np.where(indices == edgeInd[i][0])[0][0]
-
-                cor_node = nodes[node_loc]
-
-                # some edges are identical to adj edges and can be replaced
-                dupeedges = []
-
-                for j in range(len(cor_node.edges)):
-
-                    adjacent_edge = cor_node.edges[j]
-
-                    if edgeInd[i][0] == adjacent_edge.start and\
-                            edgeInd[i][1] == adjacent_edge.end:
-
-                        dupeedges.append(j)
-
-                # remove any identified duplicates
-                [cor_node.edges.pop(j) for j in dupeedges]
-
-                edge = pog_graph.Edge(start=edgeInd[i][0],
-                                      end=edgeInd[i][1],
-                                      edgeType=jpog["Edgetype"],
-                                      recip=edge_info["Recip"],
-                                      backward=edge_info["Backward"],
-                                      forward=edge_info["Forward"],
-                                      weight=edge_info["Weight"])
-
-                cor_node.edges.append(edge)
+        addAncestralEdges(jpog["Edgeindices"], jpog["Edges"],
+                          jpog["Edgetype"], indices, nodes)
 
     # adds ancestor identifier "N"
     name = jpog["Name"]
@@ -501,17 +458,17 @@ def POGraphFromJSON(jpog: dict, isAncestor: bool = False) -> pog_graph.POGraph:
 
 
 def POGTreeFromJointReconstruction(nwk: Union[str, dict], POG_graphs: dict) -> pog_tree.POGTree:
-    """Creates an instance of the POGTree data structure. A nwk 
-    file OR output from g_requests.requestPOGTree() can be used 
-    to create tree topology with the second option also creating 
-    POGraphs for extants. 
+    """Creates an instance of the POGTree data structure. A nwk
+    file OR output from g_requests.requestPOGTree() can be used
+    to create tree topology with the second option also creating
+    POGraphs for extants.
 
     Parameters:
-        nwk (str or dict): Users can input a nwk file path 
+        nwk (str or dict): Users can input a nwk file path
         or can provide the output from g_requests.requestPOGTree().
 
 
-        POG_graphs(dict): The POGraphs for ancestors generated from  
+        POG_graphs(dict): The POGraphs for ancestors generated from
         output from g_requests.requestJointReconstruction().
 
     Returns:
@@ -539,9 +496,9 @@ def POGTreeFromJointReconstruction(nwk: Union[str, dict], POG_graphs: dict) -> p
 
         for e in nwk["Result"]["Extants"]:
 
-            e = POGraphFromJSON(e, isAncestor=False)
+            ex = POGraphFromJSON(e, isAncestor=False)
 
-            graphs[e.name] = e
+            graphs[ex.name] = ex
 
     else:
         raise RuntimeError("Nwk tree in unsupported format")
@@ -565,21 +522,21 @@ def POGTreeFromJointReconstruction(nwk: Union[str, dict], POG_graphs: dict) -> p
 
 
 def csvDataToJSON(file_name: str) -> dict[str, list]:
-    """Reads in datafile and formats in the correct format for use 
-    in LearnLatentDistributions and MarginaliseDistOnAncestor. 
+    """Reads in datafile and formats in the correct format for use
+    in LearnLatentDistributions and MarginaliseDistOnAncestor.
 
-    ONLY implemented for continuous values not discrete multinomial 
+    ONLY implemented for continuous values not discrete multinomial
     symbols.
 
-    Bnkit requires that data must be in a square matrix, therefore 
-    the number of observations must be uniform and null values are 
+    Bnkit requires that data must be in a square matrix, therefore
+    the number of observations must be uniform and null values are
     in the place of "missing" observations.
 
-    Column names in CSV MUST be called "Headers" & "Data" 
+    Column names in CSV MUST be called "Headers" & "Data"
 
     If there are multiple observations for an annotation,
     separate the observations with whitespace within a cell
-    e.g. "7.0 3.3" 
+    e.g. "7.0 3.3"
     """
 
     # None get converted to null for JSON

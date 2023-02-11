@@ -20,7 +20,7 @@ class BranchPoint(object):
     """
 
     def __init__(self, id: str, parent: Union[str, None], dist: float,
-                 children: list[str], seq: Optional[sequence.Sequence] = None) -> None:
+                 children: list[Union[str, None]], seq: Optional[sequence.Sequence] = None) -> None:
         """ Constructs instance of a branchpoint.
 
         Parameters:

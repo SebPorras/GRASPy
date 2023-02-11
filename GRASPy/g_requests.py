@@ -248,9 +248,7 @@ def LearnLatentDistributions(nwk: str,
 
     params["Tree"] = parsers.nwkToJSON(tree)
 
-    j_data = parsers.csvDataToJSON(csv_data)
-
-    params["Dataset"] = j_data
+    params["Dataset"] = parsers.csvDataToJSON(csv_data)
 
     # load all parameters
     request["Params"] = params
@@ -309,9 +307,7 @@ def MarginaliseDistOnAncestor(nwk: str,
 
     params["Tree"] = parsers.nwkToJSON(tree)
 
-    j_data = parsers.csvDataToJSON(csv_data)
-
-    params["Dataset"] = j_data
+    params["Dataset"] = parsers.csvDataToJSON(csv_data)
 
     request["Params"] = params
 

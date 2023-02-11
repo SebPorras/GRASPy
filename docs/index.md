@@ -183,7 +183,7 @@ Closing socket...
 
 ### JointReconstruction
 
-    g_requests.JointReconstruction(aln: str, nwk: str, auth: str = "Guest,
+    g_requests.JointReconstruction(aln: str, nwk: str, alphabet: str = None, auth: str = "Guest,
     indels: str = "BEP", model: str = "JTT") -> str:
 
 Queries the bnkit server for a joint reconstruction.
@@ -197,6 +197,7 @@ use BEP for indel model and JTT for the substitution model.
 - auth(str) = Authentication token, defaults to Guest
 - indels(str) = Indel mode, defaults to BEP
 - model(str) = Substitution model, defaults to JTT
+- alphabet(str) = Sequence type. e.g. DNA or Protein. If user does not specify, it will guess based on sequence content.
 
 **Returns:**
 
