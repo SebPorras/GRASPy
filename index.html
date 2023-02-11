@@ -1,0 +1,1060 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.12">
+    
+    
+      
+        <title>My Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.0d440cfe.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.2505c338.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#graspy" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="." title="My Docs" class="md-header__button md-logo" aria-label="My Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            My Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              GRASPy
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="My Docs" class="md-nav__button md-logo" aria-label="My Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    My Docs
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          GRASPy
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="." class="md-nav__link md-nav__link--active">
+        GRASPy
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#requests" class="md-nav__link">
+    Requests
+  </a>
+  
+    <nav class="md-nav" aria-label="Requests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#placeinqueue" class="md-nav__link">
+    PlaceInQueue
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#joboutput" class="md-nav__link">
+    JobOutput
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#viewqueue" class="md-nav__link">
+    ViewQueue
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#canceljob" class="md-nav__link">
+    CancelJob
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jobstatus" class="md-nav__link">
+    JobStatus
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commands" class="md-nav__link">
+    Commands
+  </a>
+  
+    <nav class="md-nav" aria-label="Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jointreconstruction" class="md-nav__link">
+    JointReconstruction
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extantpogtree" class="md-nav__link">
+    ExtantPOGTree
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#learnlatentdistributions" class="md-nav__link">
+    LearnLatentDistributions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#marginalisedistonancestor" class="md-nav__link">
+    MarginaliseDistOnAncestor
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-structures" class="md-nav__link">
+    Data Structures
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Structures">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pogtreefromjointreconstruction" class="md-nav__link">
+    POGTreeFromJointReconstruction
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pogtree" class="md-nav__link">
+    POGTree
+  </a>
+  
+    <nav class="md-nav" aria-label="POGTree">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#writetonwk" class="md-nav__link">
+    writeToNwk
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#writetofasta" class="md-nav__link">
+    writeToFasta
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#branchpoint" class="md-nav__link">
+    BranchPoint
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#symnode" class="md-nav__link">
+    SymNode
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#edge" class="md-nav__link">
+    Edge
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#requests" class="md-nav__link">
+    Requests
+  </a>
+  
+    <nav class="md-nav" aria-label="Requests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#placeinqueue" class="md-nav__link">
+    PlaceInQueue
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#joboutput" class="md-nav__link">
+    JobOutput
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#viewqueue" class="md-nav__link">
+    ViewQueue
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#canceljob" class="md-nav__link">
+    CancelJob
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jobstatus" class="md-nav__link">
+    JobStatus
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commands" class="md-nav__link">
+    Commands
+  </a>
+  
+    <nav class="md-nav" aria-label="Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jointreconstruction" class="md-nav__link">
+    JointReconstruction
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extantpogtree" class="md-nav__link">
+    ExtantPOGTree
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#learnlatentdistributions" class="md-nav__link">
+    LearnLatentDistributions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#marginalisedistonancestor" class="md-nav__link">
+    MarginaliseDistOnAncestor
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-structures" class="md-nav__link">
+    Data Structures
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Structures">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pogtreefromjointreconstruction" class="md-nav__link">
+    POGTreeFromJointReconstruction
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pogtree" class="md-nav__link">
+    POGTree
+  </a>
+  
+    <nav class="md-nav" aria-label="POGTree">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#writetonwk" class="md-nav__link">
+    writeToNwk
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#writetofasta" class="md-nav__link">
+    writeToFasta
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#branchpoint" class="md-nav__link">
+    BranchPoint
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#symnode" class="md-nav__link">
+    SymNode
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#edge" class="md-nav__link">
+    Edge
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="graspy">GRASPy</h1>
+<p>GRASPy is the Python API for the Graphical Representation of Ancestral Sequence Predictions.</p>
+<p>Read the GRASP paper <a href="https://doi.org/10.1371/journal.pcbi.1010633">here</a></p>
+<h2 id="requests"><strong>Requests</strong></h2>
+<p>Retrieves any information about a particular job or the output from a job.</p>
+<h3 id="placeinqueue"><strong>PlaceInQueue</strong></h3>
+<pre><code>g_requests.PlaceInQueue(job_id:str)
+</code></pre>
+<p>Requests the place in queue of a submitted job.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>job_id(str): The ID of the job</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<pre><code>str: {&quot;Job&quot;: job-number, &quot;Result&quot;:{result-JSON}}
+</code></pre>
+<p><strong>Example</strong></p>
+<pre><code class="language-console">
+&gt;&gt;&gt; g_requests.requestPlaceInQueue(job_id=19)
+
+Socket created...
+
+Connecting to server...
+
+Socket connected to 10.139.1.21 on IP 4072
+
+Closing socket...
+
+{&quot;Job&quot;:19,&quot;Place&quot;:0}
+</code></pre>
+<h3 id="joboutput"><strong>JobOutput</strong></h3>
+<pre><code>g_requests.JobResult(job_id: str)
+</code></pre>
+<p>Requests the output of a submitted job. Request will be
+denied if the job is not complete.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>job_id(str): The ID of the job</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<pre><code>str: {&quot;Job&quot;: job-number, &quot;Result&quot;:{RESULT}}
+</code></pre>
+<p><strong>Example</strong></p>
+<pre><code class="language-console">
+&gt;&gt;&gt;g_requests.JobResult(19)
+
+Socket created...
+
+Connecting to server...
+
+Socket connected to 10.139.1.21 on IP 4072
+
+Closing socket...
+
+</code></pre>
+<h3 id="viewqueue"><strong>ViewQueue</strong></h3>
+<pre><code>g_requests.ViewQueue()
+</code></pre>
+<p>Lists all the jobs currently being
+performed by the server</p>
+<p>Parameters:</p>
+<ul>
+<li>job_id(str): The ID of the job</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<pre><code>str: {&quot;Job&quot;: job-number, &quot;Result&quot;:{result-JSON}}
+</code></pre>
+<p><strong>Example</strong></p>
+<pre><code class="language-console">
+&gt;&gt;&gt;g_requests.JobResult(19)
+
+Socket created...
+
+Connecting to server...
+
+Socket connected to 10.139.1.21 on IP 4072
+
+{'Jobs': [{'Status': 'COMPLETED','Threads': 1, 'Command': 'Recon','Priority': 0,
+'Memory': 1, 'Auth': 'Guest','Job': 1, 'Place': 0},{'Status': 'COMPLETED',
+'Threads': 1,'Command': 'Recon','Priority': 0,'Memory': 1, 'Auth': 'Guest',
+'Job': 2,'Place': 0}]}
+
+Closing socket...
+
+</code></pre>
+<h3 id="canceljob">CancelJob</h3>
+<pre><code>g_requests.CancelJob(job_id: str)
+</code></pre>
+<p>Requests the status of a submitted job.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>job_id(str): The ID of the job</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<pre><code>str: {&quot;Job&quot;: job-number}
+</code></pre>
+<p><strong>Example</strong></p>
+<pre><code class="language-console">
+&gt;&gt;&gt;g_requests.CancelJob(19)
+
+Socket created...
+
+Connecting to server...
+
+Socket connected to 10.139.1.21 on IP 4072
+
+{'Job': 19}
+
+Closing socket...
+
+</code></pre>
+<h3 id="jobstatus"><strong>JobStatus</strong></h3>
+<pre><code>g_requests.JobStatus(job_id: str)
+</code></pre>
+<p>Requests the status of job as either completed or queued.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>job_id(str): The ID of the job</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<pre><code>str: {'Status': 'COMPLETED', 'Job': job-number}
+</code></pre>
+<p><strong>Example</strong></p>
+<pre><code class="language-console">
+&gt;&gt;&gt;g_requests.JobStatus(19)
+
+Socket created...
+
+Connecting to server...
+
+Socket connected to 10.139.1.21 on IP 4072
+
+Closing socket...
+
+{'Status': 'COMPLETED', 'Job': job-number}
+</code></pre>
+<h2 id="commands">Commands</h2>
+<h3 id="jointreconstruction">JointReconstruction</h3>
+<pre><code>g_requests.JointReconstruction(aln: str, nwk: str, alphabet: str = None, auth: str = "Guest,
+indels: str = "BEP", model: str = "JTT") -&gt; str:
+</code></pre>
+<p>Queries the bnkit server for a joint reconstruction.
+Will default to standard bnkit reconstruction parameters which
+use BEP for indel model and JTT for the substitution model.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>aln(str) = file name of aln file</li>
+<li>nwk(str) = file name of nwk file</li>
+<li>auth(str) = Authentication token, defaults to Guest</li>
+<li>indels(str) = Indel mode, defaults to BEP</li>
+<li>model(str) = Substitution model, defaults to JTT</li>
+<li>alphabet(str) = Sequence type. e.g. DNA or Protein. If user does not specify, it will guess based on sequence content.</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<pre><code>str - {&quot;Message&quot;:&quot;Queued&quot;,&quot;Job&quot;: job-number}
+</code></pre>
+<p><strong>Example</strong></p>
+<pre><code class="language-console">&gt;&gt;&gt; JointReconstruction(aln=&quot;test_aln.aln&quot;, nwk=&quot;test_nwk.nwk&quot;)
+
+Socket created...
+
+Connecting to server...
+
+Socket connected to 10.139.1.21 on IP 4072
+
+Closing socket...
+
+{&quot;Message&quot;:&quot;Queued&quot;,&quot;Job&quot;: job-number}
+
+</code></pre>
+<h3 id="extantpogtree"><strong>ExtantPOGTree</strong></h3>
+<pre><code>g_requests.ExtantPOGTree(aln: str, nwk: str, auth: str = "Guest")
+</code></pre>
+<p>Queries the server to turn an alignment
+and a nwk file into the POGTree format with POGraphs for extants.
+This output JSON can be converted into a POGTree object
+via POGTreeFromJSON()</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>aln(str) = file name of aln file</li>
+<li>nwk(str) = file name of nwk file</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<pre><code>Dict: POGTree and POGraphs in JSON format
+</code></pre>
+<p><strong>Example</strong></p>
+<pre><code class="language-console">&gt;&gt;&gt; ExtantPOGTree(aln=&quot;test_aln.aln&quot;, nwk=&quot;test_nwk.nwk&quot;)
+
+Socket created...
+
+Connecting to server...
+
+Socket connected to 10.139.1.21 on IP 4072
+
+Closing socket...
+
+{&quot;Job&quot;:&lt;job-number&gt;, &quot;Result&quot;:{result-JSON}}
+
+</code></pre>
+<h3 id="learnlatentdistributions"><strong>LearnLatentDistributions</strong></h3>
+<pre><code>LearnLatentDistributions(nwk: str, states: list[str], csv_data: str, auth: str = "Guest")
+</code></pre>
+<p>Learns the distribution of an arbitrary number of discrete
+states. The output from the job will be a new/refined distribution.</p>
+<p><strong>CSV input requirements:</strong></p>
+<p><em>-CSV files containing data MUST be formatted as outlined below.
+The column with names of extant sequences must be named "Headers"</em></p>
+<p><em>-The column with data points MUST be named "Data".</em></p>
+<p><em>- Data with multiple observations must be spaced with whitespace e.g "8.8 1.2"</em></p>
+<pre><code>Headers,Data
+A5ILB0,8.5
+P08144,7.35 3.3
+H9B4I9
+</code></pre>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>nwk(str) = path to file name of nwk</li>
+<li>states(list) = a list of names for states</li>
+<li>csv_data(str) = path to csv with data</li>
+<li>auth(str) = Authentication token, defaults to Guest</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<pre><code>str: {&quot;Message&quot;:&quot;Queued&quot;,&quot;Job&quot;: job-number}
+</code></pre>
+<p><strong>Example</strong></p>
+<pre><code class="language-console">&gt;&gt;&gt; LearnLatentDistributions(nwk=&quot;training.nwk&quot;, states=[&quot;A&quot;, &quot;B&quot;], data=&quot;train_data.csv&quot;)
+
+Socket created...
+
+Connecting to server...
+
+Socket connected to 10.139.1.21 on IP 4072
+
+Closing socket...
+
+{'Message': 'Queued', 'Job': 42}
+</code></pre>
+<p><strong>Completed job output:</strong></p>
+<p><em>- The distributions for each Condition(e.g. "A" or "B") are ordered based on the "Condition" list.</em></p>
+<p><em>- Lists within "Pr" contain the mean and variance in that order for each condition.</em></p>
+<pre><code class="language-console">{ &quot;Distrib&quot;:
+    { &quot;Condition&quot;:[[&quot;A&quot;],[&quot;B&quot;]],
+      &quot;Pr&quot;:[[3.784926135903969,0.056738891699391655],
+      [2.5324588293595744,0.056738891699391655]],
+      &quot;Index&quot;:[0,1],
+      &quot;Domain&quot;:&quot;dat.Continuous@3bd5adde&quot;
+    }
+}
+</code></pre>
+<h3 id="marginalisedistonancestor"><strong>MarginaliseDistOnAncestor</strong></h3>
+<pre><code>MarginaliseDistOnAncestor(nwk: str, states: list[str], csv_data: str, distrib: dict, ancestor: int, leaves_only: bool = True, auth: str = "Guest"):
+</code></pre>
+<p>Marginalises on an ancestral node using the latent
+distributions determined from LearnLatentDistributions().
+Although its possible, I have not added parameters for
+rate, seed or gamma values.</p>
+<p><strong>CSV input requirements:</strong></p>
+<p><em>-CSV files containing data MUST be formatted as outlined below.
+The column with names of extant sequences must be named "Headers"</em></p>
+<p><em>-The column with data points MUST be named "Data".</em></p>
+<p><em>- Data with multiple observations must be spaced with whitespace e.g "8.8 1.2"</em></p>
+<pre><code>Headers,Data
+A5ILB0,8.5
+P08144,7.35 3.3
+H9B4I9
+</code></pre>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>nwk(str) = path to file name of nwk</li>
+<li>states(list) = a list of names for states</li>
+<li>csv_data(str) = path to csv with data</li>
+<li>distrib(dict) = a previously trained distribution from data</li>
+<li>ancestor(int) = Specify which ancestor to marginalise on</li>
+<li>leaves_only(bool) = ...</li>
+<li>auth(str) = Authentication token, defaults to Guest</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<pre><code>str: {&quot;Message&quot;:&quot;Queued&quot;,&quot;Job&quot;: job-number}
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code class="language-console">&gt;&gt;&gt; MarginaliseDistOnAncestor(nwk=&quot;training.nwk&quot;, states=[&quot;A&quot;, &quot;B&quot;], data=&quot;train_data.csv&quot;, ancetor=0)
+
+Socket created...
+
+Connecting to server...
+
+Socket connected to 10.139.1.21 on IP 4072
+
+Closing socket...
+
+{'Message': 'Queued', 'Job': 42}
+</code></pre>
+<p><strong>Completed job output:</strong></p>
+<p><em>- The marginalised distribution for each state are ordered in the list according to "Values".</em></p>
+<p><em>- Values within "Pr" represent the mean and variance respectively.</em></p>
+<pre><code class="language-console">{ &quot;N0&quot;:[
+    { &quot;Pr&quot;:[0.6652270145537978,0.3347729854462022],
+      &quot;Domain&quot;:{&quot;Size&quot;:2,&quot;Values&quot;:[&quot;A&quot;,&quot;B&quot;],&quot;Datatype&quot;:&quot;String&quot;}},
+    { &quot;Pr&quot;:[0.649968113685095,0.350031886314905],
+    &quot;Domain&quot;:{&quot;Size&quot;:2,&quot;Values&quot;:[&quot;A&quot;,&quot;B&quot;],&quot;Datatype&quot;:&quot;String&quot;}}
+    ]
+}
+</code></pre>
+<h2 id="data-structures"><strong>Data Structures</strong></h2>
+<ul>
+<li>GRASPy has a number of data structures that can be used to interact with output from the bnkit server responses.</li>
+</ul>
+<h3 id="pogtreefromjointreconstruction"><strong>POGTreeFromJointReconstruction</strong></h3>
+<pre><code>parsers.POGTreeFromJSON(nwk: Union[str, dict], POG_graphs: dict)
+</code></pre>
+<p>Creates an instance of the POGTree data structure. A nwk
+file OR output from JointReconstruction() can be used
+to create tree topology with the second option also creating
+POGraphs for extants.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>nwk (str or dict): Users can input a nwk file path or can provide
+  the output from g_requests.requestPOGTree().</li>
+<li>POG_graphs(dict): The POGraphs for ancestors generated from
+  output from g_requests.requestJointReconstruction().</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<pre><code>&lt;POGTree&gt;
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code class="language-console">&gt;&gt;&gt; tree = POGTreeFromJointReconstruction(nwk=&quot;example.nwk&quot;, POG_graphs=graphs)
+</code></pre>
+<h3 id="pogtree"><strong>POGTree</strong></h3>
+<pre><code>POGTree(nBranches: int, branchpoints: dict[str, BranchPoint],
+             parents: list[int], children: list[list[Union[int, None]]],
+             indices: dict[str, int], distances: list[float],
+             POGraphs: dict[str, POGraph])
+</code></pre>
+<p>The Partial Order Graph Tree (POGTree), is a phylogenetic tree made up
+of branchpoints which represent nodes on the tree.
+Each branchpoint is assigned an index and a BranchPoint
+object, allowing easy access of information via the sequence name of
+an extant or an ancestor. 2) A POGraph object which describes
+the graph of the sequence at that branchpoint.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>idxTree: Instance of the IdxTree class</li>
+<li>POGraphs(dict): maps sequence IDs to POGraph class</li>
+<li>nBranches(int): number of branch points in the tree</li>
+<li>branchpoints(dict[str, BranchPoint]): Contains BranchPoint objects</li>
+<li>parents(list[int]): maps the index of the child to the index
+  of the parent</li>
+<li>children(list[list[Union[int, None]]]): maps the index of the
+  parent to an array containing the indexes the child/children</li>
+<li>indices(dict[str, int]): Maps the sequence ID to the index on the
+  tree</li>
+<li>distances(list[float]): Maps the branchpoint to the distance to
+  its parent</li>
+</ul>
+<h4 id="writetonwk"><strong>writeToNwk</strong></h4>
+<pre><code>writeToNwk(file_name: str, root: str = "N0")
+</code></pre>
+<p>Converts the POGTree object into a nwk string and writes this to a file</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>file_name(str) : name of nwk file</li>
+<li>root(str): Default set to N0 at the "root" ancestor but can be changed to internal nodes to create subtrees if desired.</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<pre><code>str: The POGTree in nwk format
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code class="language-console">&gt;&gt;&gt; tree = POGTree(nwk.nwk, aln.aln)
+&gt;&gt;&gt; nwk = tree.writeNwk(test_nwk.nwk)
+&gt;&gt;&gt; print(nwk)
+(XP_004050792.2:0.040380067,XP_005216113.1:0.028035396,(XP_018963554.1:0.016721581,XP_016357833.1:0.024301326)N1:0.347992941)N0:0;
+</code></pre>
+<h4 id="writetofasta"><strong>writeToFasta</strong></h4>
+<pre><code>writeToFasta(file_name: str)
+</code></pre>
+<p>Writes all sequences of the tree to file.
+Sequence for ancestors are based on a joint
+reconstruction and each symbol is the most likely
+at each position.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>file_name(str) : name of fasta file</li>
+</ul>
+<p><strong>Returns:</strong></p>
+<pre><code>None
+</code></pre>
+<p><strong>Example:</strong></p>
+<pre><code class="language-console">&gt;&gt;&gt;POGTree(&quot;test_fasta&quot;)
+&gt;&gt;&gt;
+</code></pre>
+<h3 id="branchpoint"><strong>BranchPoint</strong></h3>
+<pre><code>BranchPoint(id: str, parent: Union[str, None], dist: float,
+             children: list[str], seq: Optional[Sequence] = None)
+</code></pre>
+<p>Represents a branchpoint on a phylogenetic tree. Can contain
+information about the parents or children of that point and how
+long that branch point is.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>id(str): Sequence ID</li>
+<li>parent(str or None): ID of parent</li>
+<li>dist(float): Distance to parent</li>
+<li>children(list): IDs children of current BranchPoint</li>
+<li>seq(Sequence): The sequence based on a joint reconstruction
+  if the BranchPoint is an ancestor otherwise it is just
+  the sequence of an extant. Contains a Sequence object.</li>
+</ul>
+<h3 id="symnode"><strong>SymNode</strong></h3>
+<pre><code>SymNode(name: int, symbol: str, edges: list)
+</code></pre>
+<p>Only implemented for output from joint reconstruction.
+Stores the most likely character at a given sequence position
+and all of the edges at this position.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>name(int): index position in sequence</li>
+<li>symbol(str): Most likely amino acid based on joint reconstruction</li>
+<li>edges(list): Contains all outgoing edges at this position</li>
+</ul>
+<h3 id="edge"><strong>Edge</strong></h3>
+<pre><code>Edge(start: int, end: int, edgeType: Optional[str] = None, recip: Optional[bool] = None, backward: Optional[bool] = None, forward: Optional[bool] = None, weight: Optional[float] = None)
+</code></pre>
+<p>Creates instance of an edge between two positions in a sequence.
+Currently only implemented for bidirectional edges.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li>start(int): position of beginning of edge</li>
+<li>end(int): position of end of edge</li>
+<li>edgeType(str): Currently only supports bidirectional edge</li>
+<li>recip(bool): ASK ABOUT THIS</li>
+<li>backward(bool): Direction of edge</li>
+<li>forward(bool): Direction of edge</li>
+<li>weight(float): Support of the edge</li>
+</ul>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": ".", "features": [], "search": "assets/javascripts/workers/search.db81ec45.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="assets/javascripts/bundle.4b2c34cd.min.js"></script>
+      
+    
+  </body>
+</html>
