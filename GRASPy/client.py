@@ -73,7 +73,7 @@ def sendRequest(message: str) -> str:
 
     #print("Socket created...\n")
 
-    HOST = '10.139.1.21'
+    HOST = 'localhost'
     PORT = 4072
 
     print("Connecting to server...\n")

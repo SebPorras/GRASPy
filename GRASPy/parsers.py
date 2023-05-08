@@ -226,7 +226,6 @@ def nwkToJSON(nwk: str) -> dict:
 
     return json_idx
 
-
 def alnToJSON(file_name: str, data_type: Optional[str] = None) -> dict:
     """
     Creates a dictionary where seq ids are the key
@@ -253,6 +252,7 @@ def alnToJSON(file_name: str, data_type: Optional[str] = None) -> dict:
         tmp["Name"] = seq.name
 
         # remove any gap characters
+        # TODO: Note from Sam - this treats gaps as missing data rather than gaps. Should use gappy alphabet instead (see methods for modes)?
         tmp["Seq"] = [None if s == "-" else s for s in seq.sequence]
 
         j_seqs.append(tmp)
@@ -562,5 +562,72 @@ def csvDataToJSON(file_name: str) -> dict[str, list]:
                 obs.append(None)
 
     j_data["Data"] = formatted
+
+    return j_data
+
+
+def motifDistribJSON(node_names : list[str],
+                     n_latent : int,
+                     alpha : str = 'Protein with gap'
+                     ):
+    """
+    Construct the input JSON dict for motif mode training
+
+    NOTE: Specific to motifs as data type for a single mode - need to generalise this further
+    """
+
+    distrib = dict()
+
+    # Mapping of each real node to the set of target latent nodes
+    # NOTE: In this specific case, all mapped to the single latent node
+    targets = [[0] for node in node_names]
+    distrib["Targets"] = targets
+
+    # Properties of latent states (modes)
+    # NOTE: Hard-coded for a single mode, with n_latent possible states
+    state_vals = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    modetypes = [{"Size" : n_latent, "Values" : [state_vals[i] for i in range(n_latent)], "Datatype" : "Character"}]
+    distrib["Modetypes"] = modetypes
+
+    # Real nodes, indexed by node_names
+    # NOTE: Hard-coded as CPTs for representing characters within a motif
+    nodes = [{"Condition" : [],
+              "Pr" : [],
+              "Variable" : {"Domain" : {"Predef" : alpha}, "Name" : f"N0__{name}"},
+              "Nodetype" : "CPT",
+              "Index" : []
+        } for name in node_names]
+    distrib["Nodes"] = nodes
+
+    # Distrib name matches prefix for node names - hard-coded as 'N0' here
+    distrib["Name"] = "N0"
+
+    return distrib
+
+
+def modeDataToJSON(file_name : str) -> dict:  # TODO: update with specific dict data type
+    """ Reads in data for evolutionary modes. 'Data' (observations) are indexed by 'item' (node label), and feature
+    (real plate nodes associated with a given latent node).
+
+    NOTE:
+    Currently this outputs datasets in the format used for training and inferring evolutionary 'modes'. It is also
+    only implemented for single observations per feature per item. TODO: I still don't understand how it works with multiple
+
+    First column headers must be "Items", subsequent column headers specify Feature names
+    """
+
+    raw = pd.read_csv(file_name, index_col=0).replace(pd.NA, None)
+
+    j_data = dict()
+
+    # Items (node labels most likely)
+    j_data["Items"] = raw.index.tolist()
+
+    # All other cols are features
+    j_data["Features"] = raw.columns.tolist()
+
+    # TODO: currently assumes one observation per feature per item
+    data = [[[raw[feature][item] for feature in j_data["Features"]] for item in j_data["Items"]]]
+    j_data["Data"] = data
 
     return j_data
