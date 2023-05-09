@@ -471,5 +471,4 @@ def InferModesMarginal(
 
     request["Params"] = params
 
-    print(request)
     return send_and_recieve(request)
