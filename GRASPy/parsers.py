@@ -631,3 +631,44 @@ def modeDataToJSON(file_name : str) -> dict:  # TODO: update with specific dict 
     j_data["Data"] = data
 
     return j_data
+
+
+def motifProbsFromInference(distribs : dict, inference : dict, alpha : str ='Protein with gap'):
+    """ Provide sequence motif position probabilities from inferred latent state probabilities of the form outputted by
+    g_requests.InferModes. Returns a nested dictionary of the form:
+    {Query1 : {Position1 : {'A' : P(A), 'C' : P(C), ..., '-' : P(-)}, ..... }, ..... }
+    where queries are nodes (leaves or ancestors) targeted for inference, and probabilities correspond to each of 20
+    amino acids plus the gap character. Note: this assumes a single 'mode' is used for inference. """
+
+    alpha = "ACDEFGHIKLMNPQRSTVWY-" # if alpha == 'Protein with gap' else ... TODO: Implement for other alphabets
+    all_probs = {}
+    queries = inference["Result"]["Predict"]["Items"]   # Nodes targeted for inference
+
+    for i in range(len(queries)):
+        query_probs = {}  # Positions for this query node
+        latent_probs = inference["Result"]["Predict"]["Data"][0][i][0]["Pr"]  # Only a single sample and single mode
+
+        for j in range(len(distribs["Nodes"])):  # For each motif position
+            aa_probs = {}  # AA distribution for this position
+            pos_name = distribs["Nodes"][j]["Variable"]["Name"].split('__')[1]
+
+            for k in range(len(alpha)):  # Marginal probs for each character
+                total_prob = 0
+
+                for l in range(len(latent_probs)):
+                    # sum(latent_prob * conditional_prob of AA) for each latent state character
+                    total_prob += latent_probs[l] * distribs["Nodes"][j]["Pr"][l][k]
+
+                aa_probs[alpha[k]] = total_prob
+
+            query_probs[pos_name] = aa_probs
+
+        all_probs[queries[i]] = query_probs
+
+    return all_probs
+
+
+
+
+
+
